@@ -10,8 +10,6 @@
 *.userosscache
 *.sln.docstates
 *AssemblyInfo.cs
-*GivingCircle.Api.DataAccess.csproj
-*GivingCircle.Api.Models.csproj
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
