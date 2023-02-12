@@ -16,8 +16,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{BE18C2DC-DF16-403A-B4FD-B25AEAD8E2E9}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
-		.github\workflows\buildandtest.yml = .github\workflows\buildandtest.yml
 		README.md = README.md
+		.github\workflows\build.yml = .github\workflows\build.yml
+		.github\workflows\test.yml = .github\workflows\test.yml
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GivingCircle.Api.Models", "src\GivingCircle.Api.Models\GivingCircle.Api.Models.csproj", "{02B15215-A228-417B-B81E-07E1FBF2A2AD}"
