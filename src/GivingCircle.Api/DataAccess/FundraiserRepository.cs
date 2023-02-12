@@ -3,7 +3,7 @@ using GivingCircle.Api.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace GivingCircle.Api.DataAccess.Repositories
+namespace GivingCircle.Api.DataAccess
 {
     public class FundraiserRepository : IFundraiserRepository
     {

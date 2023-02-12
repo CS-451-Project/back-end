@@ -20,10 +20,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GivingCircle.Api.DataAccess", "src\GivingCircle.Api.DataAccess\GivingCircle.Api.DataAccess.csproj", "{144D59E4-3FBB-434E-88B5-EC5CC1C0FFD6}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GivingCircle.Api.Models", "src\GivingCircle.Api.Models\GivingCircle.Api.Models.csproj", "{5ECB74A2-D9F4-4E0A-8C1F-B0B0AD68A1F5}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

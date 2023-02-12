@@ -23,7 +23,7 @@ jobs:
         dotnet-version: 6.0.x
 
     - name: Install dependencies
-      run: dotnet restore && src/GivingCircle.Api.DataAccess/GivingCircle.Api.DataAccess.csproj && src/GivingCircle.Api.Models/GivingCircle.Api.Models.csproj
+      run: dotnet restore
       
     - name: Build
       run: dotnet build --configuration Release --no-restore
