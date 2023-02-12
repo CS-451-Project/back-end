@@ -26,7 +26,7 @@ var builder = WebApplication.CreateBuilder(args);
         new PostgresClient<Fundraiser>(
             new GivingCircle.Api.DataAccess.PostgresClientConfiguration
             { 
-                ConnectionString = builder.Configuration.GetConnectionString("FundraiserConnection")
+                ConnectionString = builder.Configuration.GetConnectionString("DbConnection")
             }
             )));
 

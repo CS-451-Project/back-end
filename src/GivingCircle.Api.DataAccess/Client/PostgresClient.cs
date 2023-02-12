@@ -6,11 +6,16 @@ using System.Threading.Tasks;
 
 namespace GivingCircle.Api.DataAccess.Client
 {
+    /// <inheritdoc/>
     public class PostgresClient<T> : IPostgresClient<T>
     {
         // The postgres client configuration
         private PostgresClientConfiguration _postgresClientConfiguration;
 
+        /// <summary>
+        /// Creates an instance of the <see cref="PostgresClient{T}"/> class
+        /// </summary>
+        /// <param name="postgresClientConfiguration">The postgres client configuration</param>
         public PostgresClient(PostgresClientConfiguration postgresClientConfiguration)
         {
             _postgresClientConfiguration = postgresClientConfiguration;
