@@ -1,5 +1,4 @@
 ﻿using Dapper;
-using GivingCircle.Api.DataAccess.Client;
 using Npgsql;
 using System.Collections.Generic;
 using System.Data;
@@ -18,7 +17,7 @@ namespace GivingCircle.Api.DataAccess.Client
             DefaultTypeMap.MatchNamesWithUnderscores = true;
         }
 
-        public async Task<int> ExecuteAsync(string query, object parameters, IDbTransaction? transaction = null, int? commandTimeout = null)
+        public async Task<int> ExecuteAsync(string query, object parameters, IDbTransaction transaction = null, int? commandTimeout = null)
         {
             using (var connection = new NpgsqlConnection(_postgresClientConfiguration.ConnectionString))
             {
@@ -26,7 +25,7 @@ namespace GivingCircle.Api.DataAccess.Client
             }
         }
 
-        public async Task<IEnumerable<T>> QueryAsync(string query, object? parameters = null, IDbTransaction? transaction = null, int? commandTimeout = null)
+        public async Task<IEnumerable<T>> QueryAsync(string query, object parameters = null, IDbTransaction transaction = null, int? commandTimeout = null)
         {
             using (var connection = new NpgsqlConnection(_postgresClientConfiguration.ConnectionString))
             {
@@ -34,7 +33,7 @@ namespace GivingCircle.Api.DataAccess.Client
             }
         }
 
-        public async Task<T> QuerySingleAsync(string query, object? parameters = null, IDbTransaction? transaction = null, int? commandTimeout = null)
+        public async Task<T> QuerySingleAsync(string query, object parameters = null, IDbTransaction transaction = null, int? commandTimeout = null)
         {
             using (var connection = new NpgsqlConnection(_postgresClientConfiguration.ConnectionString))
             {
