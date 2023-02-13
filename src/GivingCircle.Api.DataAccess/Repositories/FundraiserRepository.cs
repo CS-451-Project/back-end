@@ -7,18 +7,18 @@ namespace GivingCircle.Api.DataAccess
 {
     public class FundraiserRepository : IFundraiserRepository
     {
-        private readonly PostgresClient<Fundraiser> _postgresClient;
+        private readonly PostgresClient _postgresClient;
 
         private readonly string _tableName = "fundraisers";
 
-        public FundraiserRepository(PostgresClient<Fundraiser> postgresClient) 
+        public FundraiserRepository(PostgresClient postgresClient) 
         {
             _postgresClient = postgresClient;
         }
 
         public async Task<IEnumerable<Fundraiser>> ListAllFundraisersAsync()
         {
-            return await _postgresClient.QueryAsync($"SELECT * FROM {_tableName}");
+            return await _postgresClient.QueryAsync<Fundraiser>($"SELECT * FROM {_tableName}");
         }
     }
 }

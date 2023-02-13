@@ -8,8 +8,7 @@ namespace GivingCircle.Api.DataAccess.Client
     /// In order to standardize transactions with the database, this interface outlines the methods we can call against
     /// our repositories.
     /// </summary>
-    /// <typeparam name="T">The type you will be querying against</typeparam>
-    public interface IPostgresClient<T>
+    public interface IPostgresClient
     {
         /// <summary>
         /// Runs queries on the database.
@@ -19,7 +18,14 @@ namespace GivingCircle.Api.DataAccess.Client
         /// <param name="transaction">The database transaction</param>
         /// <param name="commandTimeout">The timeout</param>
         /// <returns>A list if objects returned from the database, or nothing</returns>
-        Task<IEnumerable<T>> QueryAsync(string query, object parameters = null, IDbTransaction transaction = null, int? commandTimeout = null);
+        /// <typeparam name="T">The type that the query result will be implicitly mapped to</typeparam>
+        Task<IEnumerable<T>> QueryAsync<T>(
+            string query,
+            object parameters = null,
+            IDbTransaction transaction = null,
+            int? commandTimeout = null)
+
+            where T : class;
 
         /// <summary>
         /// Runs a query for a single object in the database.
@@ -29,7 +35,14 @@ namespace GivingCircle.Api.DataAccess.Client
         /// <param name="transaction">The database transaction</param>
         /// <param name="commandTimeout">The timeout</param>
         /// <returns>A single object, or nothing</returns>
-        Task<T> QuerySingleAsync(string query, object parameters = null, IDbTransaction transaction = null, int? commandTimeout = null);
+        /// <typeparam name="T">The type that the query result will be implicitly mapped to</typeparam>
+        Task<T> QuerySingleAsync<T>(
+            string query, 
+            object parameters = null, 
+            IDbTransaction transaction = null, 
+            int? commandTimeout = null)
+            
+            where T : class;
 
         /// <summary>
         /// Exeutes a query against the database, eg, INSERT or DELETE.
@@ -39,6 +52,10 @@ namespace GivingCircle.Api.DataAccess.Client
         /// <param name="transaction">The database transaction</param>
         /// <param name="commandTimeout">The timeout</param>
         /// <returns>The number of rows affected by this action</returns>
-        Task<int> ExecuteAsync(string sql, object parameters, IDbTransaction transaction = null, int? commandTimeout = null);
+        Task<int> ExecuteAsync(
+            string sql, 
+            object parameters, 
+            IDbTransaction transaction = null, 
+            int? commandTimeout = null);
     }
 }
