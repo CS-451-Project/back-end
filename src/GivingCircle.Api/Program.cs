@@ -23,8 +23,8 @@ var builder = WebApplication.CreateBuilder(args);
 
     // Register repositories
     services.AddSingleton<IFundraiserRepository>(x => new FundraiserRepository(
-        new PostgresClient<Fundraiser>(
-            new GivingCircle.Api.DataAccess.PostgresClientConfiguration
+        new PostgresClient(
+            new PostgresClientConfiguration
             { 
                 ConnectionString = builder.Configuration.GetConnectionString("DbConnection")
             }
