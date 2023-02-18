@@ -1,5 +1,6 @@
 ﻿using GivingCircle.Api.Fundraiser.DataAccess;
-using Microsoft.AspNetCore.Http;
+using GivingCircle.Api.Fundraiser.DataAccess.Exceptions;
+using GivingCircle.Api.Requests.FundraiserService;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -24,18 +25,13 @@ namespace GivingCircle.Api.Controllers
 
         }
 
-        public async Task<IActionResult> CreateFundraiser(
-            string userId,
-            string bankInformationId,
-            string title, 
-            double goalAmount,
-            string plannedEndDate,
-            string fundraiserPictureId = null,
-            string description = null)
+        [HttpPost]
+        public async Task<IActionResult> CreateFundraiser([FromBody] CreateFundraiserRequest request)
         {
-            using (_logger.BeginScope("Received GET request: {user_id}", userId))
+            using (_logger.BeginScope("Received GET request: {user_id}", request.OrganizerId))
             {
-                Fundraiser.Models.Fundraiser fundraiser;
+                string description = null;
+                var createdFundraiser = false;
 
                 try
                 {
@@ -46,34 +42,56 @@ namespace GivingCircle.Api.Controllers
                     var createdDate = DateTime.Now;
 
                     // Try to parse the given planned end date
-                    var plannedEndDateParsed = DateTime.Parse(plannedEndDate);
+                    var plannedEndDateParsed = DateTime.Parse(request.PlannedEndDate);
 
                     // If description is null then set it to empty
-                    if (description == null)
+                    if (request.Description == null)
                     {
                         description = "";
                     }
-
-                    fundraiser = new Fundraiser.Models.Fundraiser
+                    else
                     {
-                        OrganizerId = userId,
-                        BankInformationId = bankInformationId,
-                        Title = title,
+                        description = request.Description;
+                    }
+
+                    // Set the current balance
+                    var currentBalanceAmount = 0.0;
+
+                    // Note that we're not setting the GoalReachedDate or the ClosedDate
+                    // because they haven't happened yet. They'll be created as null in the db this way.
+                    // Can't set a date time object to null so have to do it that way.
+                    Fundraiser.Models.Fundraiser fundraiser = new Fundraiser.Models.Fundraiser
+                    {
+                        FundraiserId = fundraiserId,
+                        OrganizerId = request.OrganizerId,
+                        BankInformationId = request.BankInformationId,
+                        PictureId = request.PictureId,
                         Description = description,
-                        GoalTargetAmount = goalAmount,
+                        Title = request.Title,
                         CreatedDate = createdDate,
-                        PlannedEndDate = plannedEndDateParsed
+                        PlannedEndDate = plannedEndDateParsed,
+                        GoalTargetAmount = request.GoalTargetAmount,
+                        CurrentBalanceAmount = currentBalanceAmount,
+                        Tags = request.Tags
                     };
 
-                    var createFundraiser = _fundraiserRepository.CreateFundraiserAsync(fundraiser);
+                    createdFundraiser = await _fundraiserRepository.CreateFundraiserAsync(fundraiser);
                 }
-                catch (Exception err)
+                catch (BankAccountIdInvalidException err)
                 {
                     _logger.LogError(err.Message);
+                    return StatusCode(500, err.Message);
                 }
-                return Ok();
-            }
 
+                if (createdFundraiser)
+                {
+                    return StatusCode(201);
+                }
+                else
+                {
+                    return StatusCode(500);
+                }
+            }
         }
 
         /// <summary>
