@@ -16,6 +16,7 @@ namespace GivingCircle.Api.Fundraiser.DataAccess
         private readonly PostgresClient _postgresClient;
 
         private readonly string _tableName = "fundraisers";
+        private readonly string _banktable = "bank_account";
 
         /// <summary>
         /// Initializes an instance of the <see cref="FundraiserRepository"/> class
@@ -87,9 +88,17 @@ namespace GivingCircle.Api.Fundraiser.DataAccess
             throw new NotImplementedException();
         }
 
-        public Task<bool> AddBankAccount(BankAccount bankAccount)
+        public async Task<bool> AddBankAccount(BankAccount bankAccount)
         {
-            throw new NotImplementedException();
+            StringBuilder query = new StringBuilder();
+
+            var createBankAccountResult = await _postgresClient.ExecuteAsync(query
+                .Append("INSERT INTO bank_account (account_name, address, city, state, zipcode, bank_name, account_num, routing_num, account_type, bank_account_id) ")
+                .Append("VALUES (@Account_Name, @Address, @City, @State, @Zipcode, @Bank_Name, @Account_Num, @Routing_Num, @Account_Type, @Bank_Account_Id)").ToString(), bankAccount);
+
+            return createBankAccountResult == 1 ? true : false;
+
+
         }
 
         public Task<bool> DeleteBankAccountAsync(string bankAccountId)
