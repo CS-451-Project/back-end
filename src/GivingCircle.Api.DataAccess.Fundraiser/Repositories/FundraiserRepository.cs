@@ -1,4 +1,5 @@
 ﻿using GivingCircle.Api.DataAccess.Client;
+using GivingCircle.Api.Fundraiser.Models.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -78,5 +79,24 @@ namespace GivingCircle.Api.Fundraiser.DataAccess
         {
             throw new NotImplementedException();
         }
+
+        //BANK ACCOUNT METHODS
+
+        public Task<BankAccount> GetBankAccount(string bankAccountId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> AddBankAccount(BankAccount bankAccount)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> DeleteBankAccountAsync(string bankAccountId)
+        {
+            throw new NotImplementedException();
+        }
+
+
     }
 }
