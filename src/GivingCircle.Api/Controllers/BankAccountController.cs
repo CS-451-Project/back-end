@@ -26,6 +26,7 @@ namespace GivingCircle.Api.Controllers
 
         }
 
+        [HttpPost]
         public async Task<IActionResult> AddBankAccount([FromBody] BankAccount bankaccount)
         {
             _logger.LogInformation("Received POST request");
@@ -33,6 +34,8 @@ namespace GivingCircle.Api.Controllers
             {
                 // Create the bank account id
                 var bankaccountid = Guid.NewGuid().ToString();
+
+                //Bank AAccount Object
                 BankAccount addBankAccount = new()
                 {
                     Account_Name = bankaccount.Account_Name,
@@ -46,6 +49,7 @@ namespace GivingCircle.Api.Controllers
                     Account_Type = bankaccount.Account_Type,
                     Bank_Account_Id = bankaccountid,
                   };
+
                 var result = await _fundraiserRepository.AddBankAccount(addBankAccount);
             }
             catch (Exception err)
@@ -57,7 +61,17 @@ namespace GivingCircle.Api.Controllers
             return Ok();
         }
 
+        [HttpGet("{bankAccountId}")]
+        public async Task<IActionResult> GetAccount(string bankAccountId)
+        {
+            _logger.LogInformation("Received GET request");
 
+            var result = await _fundraiserRepository.GetBankAccount(bankAccountId);
+
+            return Ok(result);
+
+
+        }
 
     }
 }

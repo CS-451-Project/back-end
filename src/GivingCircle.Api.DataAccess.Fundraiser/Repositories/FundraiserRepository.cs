@@ -83,9 +83,14 @@ namespace GivingCircle.Api.Fundraiser.DataAccess
 
         //BANK ACCOUNT METHODS
 
-        public Task<BankAccount> GetBankAccount(string bankAccountId)
+        public async Task<BankAccount> GetBankAccount(string bankAccountId)
         {
-            throw new NotImplementedException();
+            // Object to map the parameters to the query
+            object parameters = new { Bank_Account_Id = bankAccountId };
+
+            var bankAccount = await _postgresClient.QuerySingleAsync<BankAccount>("SELECT * FROM bank_account WHERE bank_account_id = @Bank_Account_Id", parameters);
+
+            return bankAccount;
         }
 
         public async Task<bool> AddBankAccount(BankAccount bankAccount)
