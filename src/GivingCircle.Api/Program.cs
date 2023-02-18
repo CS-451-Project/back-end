@@ -3,6 +3,7 @@ using FluentValidation.AspNetCore;
 using GivingCircle.Api.DataAccess;
 using GivingCircle.Api.DataAccess.Client;
 using GivingCircle.Api.Fundraiser.DataAccess;
+using GivingCircle.Api.Fundraiser.DataAccess.Repositories;
 using GivingCircle.Api.Fundraiser.Models;
 using GivingCircle.Api.Validation;
 using Microsoft.AspNetCore.Builder;
@@ -26,6 +27,15 @@ var builder = WebApplication.CreateBuilder(args);
         new PostgresClient(
             new PostgresClientConfiguration
             { 
+                ConnectionString = builder.Configuration.GetConnectionString("DbConnection")
+            }
+            )));
+
+    // Register repositories
+    services.AddSingleton<IBankAccountRepository>(x => new BankAccountRepository(
+        new PostgresClient(
+            new PostgresClientConfiguration
+            {
                 ConnectionString = builder.Configuration.GetConnectionString("DbConnection")
             }
             )));
