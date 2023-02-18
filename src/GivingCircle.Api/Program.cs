@@ -2,8 +2,8 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using GivingCircle.Api.DataAccess;
 using GivingCircle.Api.DataAccess.Client;
-using GivingCircle.Api.Models;
-using GivingCircle.Api.Services;
+using GivingCircle.Api.Fundraiser.DataAccess;
+using GivingCircle.Api.Fundraiser.Models;
 using GivingCircle.Api.Validation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -29,9 +29,6 @@ var builder = WebApplication.CreateBuilder(args);
                 ConnectionString = builder.Configuration.GetConnectionString("DbConnection")
             }
             )));
-
-    // Register services
-    services.AddSingleton<IFundraiserService, FundraiserService>();
 
     // Register automatic fluent validation
     services.AddFluentValidationAutoValidation();
