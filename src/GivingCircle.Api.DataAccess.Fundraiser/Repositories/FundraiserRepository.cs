@@ -81,36 +81,6 @@ namespace GivingCircle.Api.Fundraiser.DataAccess
             throw new NotImplementedException();
         }
 
-        //BANK ACCOUNT METHODS
-
-        public async Task<BankAccount> GetBankAccount(string bankAccountId)
-        {
-            // Object to map the parameters to the query
-            object parameters = new { Bank_Account_Id = bankAccountId };
-
-            var bankAccount = await _postgresClient.QuerySingleAsync<BankAccount>("SELECT * FROM bank_account WHERE bank_account_id = @Bank_Account_Id", parameters);
-
-            return bankAccount;
-        }
-
-        public async Task<bool> AddBankAccount(BankAccount bankAccount)
-        {
-            StringBuilder query = new StringBuilder();
-
-            var createBankAccountResult = await _postgresClient.ExecuteAsync(query
-                .Append("INSERT INTO bank_account (account_name, address, city, state, zipcode, bank_name, account_num, routing_num, account_type, bank_account_id) ")
-                .Append("VALUES (@Account_Name, @Address, @City, @State, @Zipcode, @Bank_Name, @Account_Num, @Routing_Num, @Account_Type, @Bank_Account_Id)").ToString(), bankAccount);
-
-            return createBankAccountResult == 1 ? true : false;
-
-
-        }
-
-        public Task<bool> DeleteBankAccountAsync(string bankAccountId)
-        {
-            throw new NotImplementedException();
-        }
-
-
+        
     }
 }

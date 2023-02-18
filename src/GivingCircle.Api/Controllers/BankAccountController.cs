@@ -1,4 +1,5 @@
 ﻿using GivingCircle.Api.Fundraiser.DataAccess;
+using GivingCircle.Api.Fundraiser.DataAccess.Repositories;
 using GivingCircle.Api.Fundraiser.Models;
 using GivingCircle.Api.Fundraiser.Models.Models;
 using Microsoft.AspNetCore.Http;
@@ -17,12 +18,12 @@ namespace GivingCircle.Api.Controllers
     {
         private readonly ILogger<BankAccountController> _logger;
 
-        private readonly IFundraiserRepository _fundraiserRepository;
+        private readonly IBankAccountRepository _bankAccountRepository;
 
-        public BankAccountController(ILogger<BankAccountController> logger, IFundraiserRepository fundraiserRepository)
+        public BankAccountController(ILogger<BankAccountController> logger, IBankAccountRepository bankAccountRepository)
         {
             _logger = logger;
-            _fundraiserRepository = fundraiserRepository;
+            _bankAccountRepository = bankAccountRepository;
 
         }
 
@@ -50,7 +51,7 @@ namespace GivingCircle.Api.Controllers
                     Bank_Account_Id = bankaccountid,
                   };
 
-                var result = await _fundraiserRepository.AddBankAccount(addBankAccount);
+                var result = await _bankAccountRepository.AddBankAccount(addBankAccount);
             }
             catch (Exception err)
             {
@@ -66,11 +67,21 @@ namespace GivingCircle.Api.Controllers
         {
             _logger.LogInformation("Received GET request");
 
-            var result = await _fundraiserRepository.GetBankAccount(bankAccountId);
+            var result = await _bankAccountRepository.GetBankAccount(bankAccountId);
 
             return Ok(result);
 
 
+        }
+
+        [HttpDelete("{bankAccountId}")]
+        public async Task<IActionResult> DeleteBankAccount(string bankAccountId)
+        {
+            _logger.LogInformation("Received DELETE request");
+
+            var result = await _bankAccountRepository.DeleteBankAccountAsync(bankAccountId);
+
+            return result ? StatusCode(204) : StatusCode(500);
         }
 
     }
