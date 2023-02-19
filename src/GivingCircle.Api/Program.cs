@@ -3,7 +3,6 @@ using FluentValidation.AspNetCore;
 using GivingCircle.Api.DataAccess;
 using GivingCircle.Api.DataAccess.Client;
 using GivingCircle.Api.Fundraiser.DataAccess;
-using GivingCircle.Api.Fundraiser.Models;
 using GivingCircle.Api.Requests;
 using GivingCircle.Api.Validation;
 using Microsoft.AspNetCore.Builder;

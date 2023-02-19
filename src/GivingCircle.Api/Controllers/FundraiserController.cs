@@ -1,11 +1,12 @@
 ﻿using GivingCircle.Api.Fundraiser.DataAccess;
 using GivingCircle.Api.Fundraiser.DataAccess.Exceptions;
+using GivingCircle.Api.Fundraiser.DataAccess.Responses;
 using GivingCircle.Api.Requests;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Reflection;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace GivingCircle.Api.Controllers
@@ -35,10 +36,11 @@ namespace GivingCircle.Api.Controllers
         [HttpGet("{userId}")]
         public async Task<IActionResult> ListFundraisersByUserId(string userId)
         {
-            IEnumerable<Fundraiser.Models.Fundraiser> fundraisers;
+            IEnumerable<GetFundraiserResponse> fundraisers;
 
             try
             {
+                // Validate the provided user id
                 Guid.Parse(userId);
 
                 fundraisers = await _fundraiserRepository.ListFundraisersByUserIdAsync(userId);
@@ -57,31 +59,49 @@ namespace GivingCircle.Api.Controllers
             return Ok(fundraisers);
         }
 
+        /// <summary>
+        /// Filters fundraiasers based on various criteria
+        /// </summary>
+        /// <param name="filterProps">The filter properties</param>
+        /// <returns>A list of filtered fundraisers</returns>
         [HttpPost("filter")]
-        public async Task<IActionResult> FilterFundraisers([FromBody] FundraiserFilterPropsRequest filterProps)
+        public async Task<IActionResult> FilterFundraisers([FromBody] FilterFundraisersRequest filterProps)
         {
-            IEnumerable<Fundraiser.Models.Fundraiser> fundraisers;
+            // The response
+            IEnumerable<GetFundraiserResponse> fundraisers;
+
+            // The filter props to supply the repository with
             Dictionary<string, string[]> dbFilterProps = new ();
 
+            // Check the title props
             if (filterProps.Title != null)
             {
-                dbFilterProps.Add("Title", new string[] { filterProps.Title });
-            }
-            else
-            {
-                dbFilterProps.Add("Title", null);
+                dbFilterProps.Add(nameof(filterProps.Title), new string[] { filterProps.Title });
             }
 
+            // Check the tag props
             if (filterProps.Tags != null)
             {
-                dbFilterProps.Add("Tags", filterProps.Tags);
+                dbFilterProps.Add(nameof(filterProps.Tags), filterProps.Tags);
+            }
+
+            // Check the created date props
+            if (filterProps.CreatedDateOffset > 0.0)
+            {
+                // Add a negative value to today to find the date time to use to compare against the db column
+                DateTime filterDate = DateTime.Now.AddDays(-filterProps.CreatedDateOffset);
+                dbFilterProps.Add(nameof(filterProps.CreatedDateOffset), new string[] { filterDate.ToString() });
+            }
+
+            // Are there any props for the query
+            if (dbFilterProps.Count > 0) 
+            {
+                fundraisers = await _fundraiserRepository.FilterFundraisersAsync(dbFilterProps);
             }
             else
             {
-                dbFilterProps.Add("Tags", null);
+                fundraisers = Enumerable.Empty<GetFundraiserResponse>();
             }
-
-            fundraisers = await _fundraiserRepository.FilterFundraisersAsync(dbFilterProps);
 
             return Ok(fundraisers);
         }
@@ -119,6 +139,8 @@ namespace GivingCircle.Api.Controllers
                     Title = request.Title,
                     CreatedDate = createdDate,
                     PlannedEndDate = plannedEndDateParsed,
+                    GoalReachedDate = null,
+                    ClosedDate = null,
                     GoalTargetAmount = request.GoalTargetAmount,
                     CurrentBalanceAmount = currentBalanceAmount,
                     Tags = request.Tags
@@ -141,7 +163,8 @@ namespace GivingCircle.Api.Controllers
         }
 
         /// <summary>
-        /// Deletes a single fundraiser
+        /// Deletes a single fundraiser. Note that we do a "soft delete", and so the fundraiser isn't physically
+        /// deleted. We set the closed_date to a non null value to indicate deletion.
         /// </summary>
         /// <param name="fundraiserId">The fundraiser's id</param>
         /// <returns>Status 200 if success, error codes if failure</returns>

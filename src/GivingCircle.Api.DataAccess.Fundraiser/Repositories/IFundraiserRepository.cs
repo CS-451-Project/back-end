@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using GivingCircle.Api.Fundraiser.DataAccess.Responses;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace GivingCircle.Api.Fundraiser.DataAccess
@@ -10,10 +11,10 @@ namespace GivingCircle.Api.Fundraiser.DataAccess
         /// </summary>
         /// <param name="userId">The users id</param>
         /// <returns>A list of fundraisers, if any</returns>
-        Task<IEnumerable<Models.Fundraiser>> ListFundraisersByUserIdAsync(string userId);
+        Task<IEnumerable<GetFundraiserResponse>> ListFundraisersByUserIdAsync(string userId);
 
         // TODO: Figure this out 
-        Task<IEnumerable<Models.Fundraiser>> FilterFundraisersAsync(Dictionary<string, string[]> filterProps);
+        Task<IEnumerable<GetFundraiserResponse>> FilterFundraisersAsync(Dictionary<string, string[]> filterProps);
 
         /// <summary>
         /// Creates a fundraiser

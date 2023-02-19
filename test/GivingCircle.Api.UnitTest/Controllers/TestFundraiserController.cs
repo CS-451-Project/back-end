@@ -1,5 +1,6 @@
 ﻿using GivingCircle.Api.Controllers;
 using GivingCircle.Api.Fundraiser.DataAccess;
+using GivingCircle.Api.Fundraiser.DataAccess.Responses;
 using GivingCircle.Api.Requests;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -18,7 +19,7 @@ namespace GivingCircle.Api.UnitTest.Controllers
         public async void TestFilterFundraisersHappyPath()
         {
             // Given
-            FundraiserFilterPropsRequest filterPropsRequest = new()
+            FilterFundraisersRequest filterPropsRequest = new()
             {
                 Title = "test",
                 Tags = new string[] { "environment", "test", "huricane relief" }
@@ -46,13 +47,12 @@ namespace GivingCircle.Api.UnitTest.Controllers
             // Given
             var userId = Guid.NewGuid().ToString();
 
-            var fundraisers = new List<Fundraiser.Models.Fundraiser>()
+            var fundraisers = new List<GetFundraiserResponse>()
             {
-                new Fundraiser.Models.Fundraiser()
+                new GetFundraiserResponse()
                 {
                     FundraiserId = Guid.NewGuid().ToString(),
                     OrganizerId = userId,
-                    BankInformationId = Guid.NewGuid().ToString(),
                     PictureId = Guid.NewGuid().ToString(),
                     Title = "Test title 1",
                     Description = "test dscription 1",
@@ -62,11 +62,10 @@ namespace GivingCircle.Api.UnitTest.Controllers
                     CurrentBalanceAmount = 500.0,
                     Tags = new string[] { "environment", "test tag" }
                 },
-                new Fundraiser.Models.Fundraiser()
+                new GetFundraiserResponse()
                 {
                     FundraiserId = Guid.NewGuid().ToString(),
                     OrganizerId = userId,
-                    BankInformationId = Guid.NewGuid().ToString(),
                     PictureId = Guid.NewGuid().ToString(),
                     Title = "Test title 2",
                     Description = "test dscription 1",

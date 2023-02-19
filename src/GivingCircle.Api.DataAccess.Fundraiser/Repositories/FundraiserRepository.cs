@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using GivingCircle.Api.DataAccess.Client;
 using GivingCircle.Api.Fundraiser.DataAccess.Exceptions;
+using GivingCircle.Api.Fundraiser.DataAccess.Responses;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,36 +29,72 @@ namespace GivingCircle.Api.Fundraiser.DataAccess
         }
 
         /// <inheritdoc/>
-        public async Task<IEnumerable<Models.Fundraiser>> FilterFundraisersAsync(Dictionary<string, string[]> filterProps)
+        public async Task<IEnumerable<GetFundraiserResponse>> FilterFundraisersAsync(Dictionary<string, string[]> filterProps)
         {
-            IEnumerable<Models.Fundraiser> fundraisers;
-            StringBuilder queryBuilder = new();
+            IEnumerable<GetFundraiserResponse> fundraisers;
             DynamicParameters parameters = new();
+            bool firstFilter = true;
 
             // Start the query
-            var query = queryBuilder
-                .Append($"SELECT * FROM {_tableName} ")
-                .ToString();
+            var query = $"SELECT * FROM {_tableName} ";
 
-            // Add the title filter if it exists
-            if (filterProps["Title"] != null)
+            // Title filter
+            if (filterProps.ContainsKey("Title"))
             {
-                query.Concat(queryBuilder
-                    .Append($"WHERE position(lower(@TitleSearchText) in lower(fundraisers.title))>0").ToString());
+                // Search if the title column contains our title search filter
+                query += $"WHERE position(lower(@TitleSearchText) in lower(title))>0 ";
 
-                parameters.Add("@TitleSearchText", filterProps["Title"]);
+                parameters.Add("@TitleSearchText", filterProps["Title"].ElementAt(0));
+
+                firstFilter = false;
             }
 
-            // Execute the query on the database
-            fundraisers = await _postgresClient.QueryAsync<Models.Fundraiser>(query, parameters);
+            // Tags filter
+            if (filterProps.ContainsKey("Tags"))
+            {
+                string queryTags = string.Empty;
 
-            return fundraisers ?? Enumerable.Empty<Models.Fundraiser>();
+                // Add the tags to a string to be used as a query parameter
+                for (int i = 0; i < filterProps["Tags"].Length; i++)
+                {
+                    // Check that we're not on the last tag for commas
+                    if (i != filterProps["Tags"].Length - 1)
+                    {
+                        queryTags += filterProps["Tags"].ElementAt(i) + ", ";
+                    }
+                    else
+                    {
+                        queryTags += filterProps["Tags"].ElementAt(i);
+                    }
+                }
+
+                parameters.Add("@TagFilters", queryTags);
+
+                // Whether this part of the query should have an AND or not
+                var and = firstFilter ? "WHERE" : "AND";
+
+                // Check if our tags overlap with any others in the tag column
+                query += $"{and} ARRAY[@TagFilters] && tags ";
+
+                firstFilter = false;
+            }
+
+            // Created Date filter
+            if (filterProps.ContainsKey(""))
+
+            // Check that the fundraisers aren't closed
+            query += "AND closed_date IS NULL ";
+
+            // Execute the query on the database
+            fundraisers = await _postgresClient.QueryAsync<GetFundraiserResponse>(query, parameters);
+
+            return fundraisers ?? Enumerable.Empty<GetFundraiserResponse>();
         }
 
         /// <inheritdoc/>
-        public async Task<IEnumerable<Models.Fundraiser>> ListFundraisersByUserIdAsync(string userId)
+        public async Task<IEnumerable<GetFundraiserResponse>> ListFundraisersByUserIdAsync(string userId)
         {
-            IEnumerable<Models.Fundraiser> fundraisers;
+            IEnumerable<GetFundraiserResponse> fundraisers;
             StringBuilder queryBuilder = new();
             DynamicParameters parameters = new ();
 
@@ -67,12 +104,13 @@ namespace GivingCircle.Api.Fundraiser.DataAccess
             var query = queryBuilder
                 .Append($"SELECT * FROM {_tableName} ")
                 .Append("WHERE organizer_id=@UserId ")
+                .Append("AND closed_date IS NULL")
                 .ToString();
             
             // Execute the query on the database
-            fundraisers = await _postgresClient.QueryAsync<Models.Fundraiser>(query, parameters);
+            fundraisers = await _postgresClient.QueryAsync<GetFundraiserResponse>(query, parameters);
 
-            return fundraisers ?? Enumerable.Empty<Models.Fundraiser>();
+            return fundraisers ?? Enumerable.Empty<GetFundraiserResponse>();
         }
 
         /// <inheritdoc/>
@@ -114,12 +152,20 @@ namespace GivingCircle.Api.Fundraiser.DataAccess
         {
             StringBuilder queryBuilder = new();
             DynamicParameters parameters = new();
+            DateTime closedDate = DateTime.Now;
 
+            parameters.Add("@ClosedDate", closedDate);
             parameters.Add("@FundraiserId", fundraiserId);
 
+            //var query = queryBuilder
+            //    .Append($"DELETE FROM {_tableName} ")
+            //    .Append("WHERE fundraiser_id=@FundraiserId")
+            //    .ToString();
+
             var query = queryBuilder
-                .Append($"DELETE FROM {_tableName} ")
-                .Append("WHERE fundraiser_id=@FundraiserId")
+                .Append($"UPDATE {_tableName} ")
+                .Append("SET closed_date = @ClosedDate ")
+                .Append("WHERE fundraiser_id = @FundraiserId")
                 .ToString();
 
             try
