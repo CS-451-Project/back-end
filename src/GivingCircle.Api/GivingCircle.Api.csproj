@@ -3,6 +3,13 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Services\**" />
+    <Content Remove="Services\**" />
+    <EmbeddedResource Remove="Services\**" />
+    <None Remove="Services\**" />
+  </ItemGroup>
 	
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.0.123" />
@@ -17,7 +24,7 @@
   </ItemGroup>
 	
   <ItemGroup>
-    <Folder Include="Services\" />
+    <Folder Include="Exceptions\" />
   </ItemGroup>
 
 </Project>

@@ -1,8 +1,7 @@
-﻿using GivingCircle.Api.DataAccess.Client;
-using GivingCircle.Api.Fundraiser.Models.Models;
+using GivingCircle.Api.DataAccess.Client;
+using GivingCircle.Api.Fundraiser.DataAccess.Exceptions;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -30,19 +29,33 @@ namespace GivingCircle.Api.Fundraiser.DataAccess
         public async Task<bool> CreateFundraiserAsync(Models.Fundraiser fundraiser)
         {
             StringBuilder queryBuilder = new StringBuilder();
+            int created = 0;
 
             // Construct the query
             queryBuilder.Append($"INSERT INTO {_tableName} ")
-                 .Append("(fundraiser_id, organizer_id, bank_information_id, picture_id, title, description, created_date, planned_end_date")
+                 .Append("(fundraiser_id, organizer_id, bank_information_id, picture_id, title, description, created_date, planned_end_date, ")
                  .Append("goal_reached_date, closed_date, goal_target_amount, current_balance_amount, tags)\n")
                  .Append("VALUES (@FundraiserId, @OrganizerId, @BankInformationId, @PictureId, @Title, @Description,")
-                 .Append("@CreatedDate,@PlannedEndDate, @GoalReachedDate, @ClosedDate, @GoalTargetAmount, @CurrentBalanceAmount, @Tags")
+                 .Append("@CreatedDate,@PlannedEndDate, @GoalReachedDate, @ClosedDate, @GoalTargetAmount, @CurrentBalanceAmount, @Tags)")
                  .ToString();
 
             var query = queryBuilder.ToString();
 
-            // Execute the query on the database
-            var created = await _postgresClient.ExecuteAsync(query, fundraiser);
+            try
+            {
+                // Execute the query on the database
+                created = await _postgresClient.ExecuteAsync(query, fundraiser);
+            }
+            catch (Npgsql.PostgresException err)
+            {
+                // 23503 is the error code thrown when we violate referential integrity
+                if (err.SqlState == "23503")
+                {
+                    throw new BankAccountIdInvalidException("Bank account id is invalid or DNE");
+                }
+                Console.WriteLine(err.Message);
+                return false;
+            }
 
             // If we created 1 new fundraiser then we succeeded
             if (created == 1)
