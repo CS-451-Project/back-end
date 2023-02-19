@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace GivingCircle.Api.Requests.FundraiserService
+namespace GivingCircle.Api.Requests
 {
     /// <summary>
     /// A create fundraiser request for 

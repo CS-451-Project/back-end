@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
-using GivingCircle.Api.Requests.FundraiserService;
+using GivingCircle.Api.Requests;
 
-namespace GivingCircle.Api.Validation.FundraiserService
+namespace GivingCircle.Api.Validation
 {
     public class CreateFundraiserRequestValidator : AbstractValidator<CreateFundraiserRequest>
     {

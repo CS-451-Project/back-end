@@ -13,7 +13,7 @@ namespace GivingCircle.Api.Fundraiser.DataAccess
         Task<IEnumerable<Models.Fundraiser>> ListFundraisersByUserIdAsync(string userId);
 
         // TODO: Figure this out 
-        Task<IEnumerable<Models.Fundraiser>> FilterFundraisersAsync();
+        Task<IEnumerable<Models.Fundraiser>> FilterFundraisersAsync(Dictionary<string, string[]> filterProps);
 
         /// <summary>
         /// Creates a fundraiser
