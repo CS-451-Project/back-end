@@ -93,6 +93,13 @@ namespace GivingCircle.Api.Controllers
                 dbFilterProps.Add(nameof(filterProps.CreatedDateOffset), new string[] { filterDate.ToString() });
             }
 
+            // Check if there is an order by prop and for ascending or descending
+            if (filterProps.OrderBy != null)
+            {
+                dbFilterProps.Add(nameof(filterProps.OrderBy), new string[] { filterProps.OrderBy });
+                dbFilterProps.Add(nameof(filterProps.Ascending), new string[] { filterProps.Ascending ? "ASC" : "DESC" });
+            }
+
             // Are there any props for the query
             if (dbFilterProps.Count > 0) 
             {

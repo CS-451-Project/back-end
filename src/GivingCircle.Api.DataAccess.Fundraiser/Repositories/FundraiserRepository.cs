@@ -31,7 +31,7 @@ namespace GivingCircle.Api.Fundraiser.DataAccess
         /// <inheritdoc/>
         public async Task<IEnumerable<GetFundraiserResponse>> FilterFundraisersAsync(Dictionary<string, string[]> filterProps)
         {
-            IEnumerable<GetFundraiserResponse> fundraisers;
+            IEnumerable<GetFundraiserResponse> fundraisers = Enumerable.Empty<GetFundraiserResponse>();
             DynamicParameters parameters = new();
             bool firstFilter = true;
 
@@ -81,12 +81,37 @@ namespace GivingCircle.Api.Fundraiser.DataAccess
 
             // Created Date filter
             if (filterProps.ContainsKey(""))
+            {
+
+            }
 
             // Check that the fundraisers aren't closed
-            query += "AND closed_date IS NULL ";
+            query += firstFilter ? "WHERE closed_date IS NULL " : "AND closed_date IS NULL ";
+
+            // Order by and ascending or descending
+            // Note that dapper doesn't like using dynamic parameters for the ORDER BY and ASC clauses
+            if (filterProps.ContainsKey("OrderBy"))
+            {
+                var orderBy = filterProps["OrderBy"].ElementAt(0);
+                var ascending = filterProps["Ascending"].ElementAt(0);
+
+                query += $"ORDER BY {orderBy} {ascending}";
+            }
+            // Default to ordering by title ascending if nothing specified
+            else
+            {
+                query += "ORDER BY title ASC";
+            }
 
             // Execute the query on the database
-            fundraisers = await _postgresClient.QueryAsync<GetFundraiserResponse>(query, parameters);
+            try
+            {
+                fundraisers = await _postgresClient.QueryAsync<GetFundraiserResponse>(query, parameters);
+            }
+            catch (Exception err)
+            {
+                Console.WriteLine(err.Message);
+            }
 
             return fundraisers ?? Enumerable.Empty<GetFundraiserResponse>();
         }
