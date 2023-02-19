@@ -20,11 +20,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.github\workflows\test.yml = .github\workflows\test.yml
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GivingCircle.Api.Fundraiser.Models", "src\GivingCircle.Api.Models\GivingCircle.Api.Fundraiser.Models.csproj", "{02B15215-A228-417B-B81E-07E1FBF2A2AD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GivingCircle.Api.Fundraiser.Models", "src\GivingCircle.Api.Fundraiser.Models\GivingCircle.Api.Fundraiser.Models.csproj", "{02B15215-A228-417B-B81E-07E1FBF2A2AD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GivingCircle.Api.DataAccess", "src\GivingCircle.Api.DataAccess\GivingCircle.Api.DataAccess.csproj", "{96576EFD-0F04-4CD4-9A11-81CB42BF52CB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GivingCircle.Api.Fundraiser.DataAccess", "src\GivingCircle.Api.DataAccess.Fundraiser\GivingCircle.Api.Fundraiser.DataAccess.csproj", "{F61B47D6-AE32-4600-874E-977DCD266E39}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GivingCircle.Api.Fundraiser.DataAccess", "src\GivingCircle.Api.Fundraiser.DataAccess\GivingCircle.Api.Fundraiser.DataAccess.csproj", "{F61B47D6-AE32-4600-874E-977DCD266E39}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
