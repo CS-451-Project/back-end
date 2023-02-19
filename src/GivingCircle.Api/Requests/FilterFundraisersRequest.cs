@@ -15,9 +15,11 @@
         public double CreatedDateOffset { get; set; }
 
         // Filter based on the end date
+        // Same principle as created date offset, except that we'll be checking that
+        // We're an amount before this date
         public double EndDateOffset { get; set; }
 
-        // Represents which column we want to order by
+        // Represents which column we want to order by / which way
         public string OrderBy { get; set; }
 
         // ASC or DESC. True if ascending

@@ -67,6 +67,15 @@ namespace GivingCircle.Api.Controllers
         [HttpPost("filter")]
         public async Task<IActionResult> FilterFundraisers([FromBody] FilterFundraisersRequest filterProps)
         {
+            // The valid order by columns. Used to map given val to table column name
+            Dictionary<string, string> orderByColumns = new()
+            {
+                { "Title", "title" },
+                { "CreatedDate", "created_date" },
+                { "PlannedEndDate", "planned_end_date" },
+                { "ClosestToTargetGoal", "current_balance_amount"}
+            };
+
             // The response
             IEnumerable<GetFundraiserResponse> fundraisers;
 
@@ -89,25 +98,33 @@ namespace GivingCircle.Api.Controllers
             if (filterProps.CreatedDateOffset > 0.0)
             {
                 // Add a negative value to today to find the date time to use to compare against the db column
-                DateTime filterDate = DateTime.Now.AddDays(-filterProps.CreatedDateOffset);
-                dbFilterProps.Add(nameof(filterProps.CreatedDateOffset), new string[] { filterDate.ToString() });
+                DateTime createdDataFilter = DateTime.Now.AddDays(-Math.Abs(filterProps.CreatedDateOffset));
+                dbFilterProps.Add(nameof(filterProps.CreatedDateOffset), new string[] { createdDataFilter.ToString() });
             }
 
-            // Check if there is an order by prop and for ascending or descending
-            if (filterProps.OrderBy != null)
+            // Check the end date props
+            if (filterProps.EndDateOffset > 0.0)
             {
-                dbFilterProps.Add(nameof(filterProps.OrderBy), new string[] { filterProps.OrderBy });
+                // Add a positive value to today to find the date time to use to compare against the db column
+                DateTime endDateFilter = DateTime.Now.AddDays(Math.Abs(filterProps.EndDateOffset));
+                dbFilterProps.Add(nameof(filterProps.EndDateOffset), new string[] { endDateFilter.ToString() });
+            }
+
+            // Check if there is an order by prop and for ascending or descending or for the closest to target goal
+            if (filterProps.OrderBy != null && orderByColumns.ContainsKey(filterProps.OrderBy))
+            {
+                dbFilterProps.Add(nameof(filterProps.OrderBy), new string[] { orderByColumns[filterProps.OrderBy] });
                 dbFilterProps.Add(nameof(filterProps.Ascending), new string[] { filterProps.Ascending ? "ASC" : "DESC" });
             }
 
-            // Are there any props for the query
-            if (dbFilterProps.Count > 0) 
+            try
             {
                 fundraisers = await _fundraiserRepository.FilterFundraisersAsync(dbFilterProps);
             }
-            else
+            catch (Exception ex)
             {
-                fundraisers = Enumerable.Empty<GetFundraiserResponse>();
+                _logger.LogError(ex.Message, ex);
+                return StatusCode(500, "Something went wrong");
             }
 
             return Ok(fundraisers);

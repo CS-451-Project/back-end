@@ -79,10 +79,30 @@ namespace GivingCircle.Api.Fundraiser.DataAccess
                 firstFilter = false;
             }
 
-            // Created Date filter
-            if (filterProps.ContainsKey(""))
+            // Created Date offset filter
+            if (filterProps.ContainsKey("CreatedDateOffset"))
             {
+                // Whether this part of the query should have an AND or not
+                var and = firstFilter ? "WHERE" : "AND";
 
+                query += $"{and} created_date > @CreatedDateOffset ";
+
+                parameters.Add("@CreatedDateOffset", DateTime.Parse(filterProps["CreatedDateOffset"].ElementAt(0)));
+
+                firstFilter= false;
+            }
+
+            // Planned End Date offset filter
+            if (filterProps.ContainsKey("EndDateOffset"))
+            {
+                // Whether this part of the query should have an AND or not
+                var and = firstFilter ? "WHERE" : "AND";
+
+                query += $"{and} planned_end_date < @EndDateOffset ";
+
+                parameters.Add("@EndDateOffset", DateTime.Parse(filterProps["EndDateOffset"].ElementAt(0)));
+
+                firstFilter= false;
             }
 
             // Check that the fundraisers aren't closed
@@ -90,12 +110,17 @@ namespace GivingCircle.Api.Fundraiser.DataAccess
 
             // Order by and ascending or descending
             // Note that dapper doesn't like using dynamic parameters for the ORDER BY and ASC clauses
-            if (filterProps.ContainsKey("OrderBy"))
+            if (filterProps.ContainsKey("OrderBy") && filterProps["OrderBy"].ElementAt(0) != "current_balance_amount")
             {
                 var orderBy = filterProps["OrderBy"].ElementAt(0);
                 var ascending = filterProps["Ascending"].ElementAt(0);
 
                 query += $"ORDER BY {orderBy} {ascending}";
+            }
+            // Logic for when we want to order by the fundraisers that are closest to their target goal
+            else if (filterProps.ContainsKey("OrderBy") && filterProps["OrderBy"].ElementAt(0) == "current_balance_amount")
+            {
+
             }
             // Default to ordering by title ascending if nothing specified
             else
@@ -111,6 +136,7 @@ namespace GivingCircle.Api.Fundraiser.DataAccess
             catch (Exception err)
             {
                 Console.WriteLine(err.Message);
+                throw;
             }
 
             return fundraisers ?? Enumerable.Empty<GetFundraiserResponse>();
