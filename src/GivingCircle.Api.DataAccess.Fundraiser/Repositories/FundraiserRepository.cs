@@ -1,6 +1,5 @@
 ﻿using Dapper;
 using GivingCircle.Api.DataAccess.Client;
-using GivingCircle.Api.Fundraiser.DataAccess.Exceptions;
 using GivingCircle.Api.Fundraiser.DataAccess.Responses;
 using System;
 using System.Collections.Generic;
