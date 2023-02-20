@@ -7,13 +7,14 @@ using GivingCircle.Api.Requests;
 using GivingCircle.Api.Fundraiser.DataAccess.Responses;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace GivingCircle.Api.IntegrationTest.Services
 {
     public class TestFundraiserService
     {
         [Fact]
-        public async Task TestCreateFundraiserFundraiser()
+        public async Task TestCreateSearchDeleteFundraiser()
         {
             // Given
             string url = "https://localhost:7000/api/fundraisers";
@@ -37,36 +38,42 @@ namespace GivingCircle.Api.IntegrationTest.Services
             application.Server.BaseAddress = new Uri(url);
 
             // When
+
+            // Create a fundraiser
             var response = await httpClient.PostAsJsonAsync(url, createFundraiserRequest);
 
             // Then
             response.EnsureSuccessStatusCode(); // Status Code 200-299
 
-            // And
+            // And retrieve the fundraiser and soft delete
             FilterFundraisersRequest filterFundraisersRequest = new()
             {
                 Title = "Test fundraiser",
-                Tags = new string[] { "test1" }
+                Tags = new string[] { "test1", "blah" },
+                CreatedDateOffset = 1.0
             };
 
+            // Try to search for the fundraiser we just created
             response = await httpClient.PostAsJsonAsync(url + "/filter", filterFundraisersRequest);
-
-            var createdFundraiserId = 0.0;
 
             var fundraiserToDelete = await response.Content.ReadAsStringAsync();
 
+            // deserilize the response
             IEnumerable<GetFundraiserResponse> getFundraiserResponse = JsonConvert.DeserializeObject<IEnumerable<GetFundraiserResponse>>(fundraiserToDelete);
 
-            // createdFundraiserId = fundraiserToDelete.
+            // get fundraiser we just created to try and delete
+            var fundraiserIdToDelete = getFundraiserResponse.ElementAt(0).FundraiserId;
 
             // Soft Delete the created fundraiser
-            response = await httpClient.DeleteAsync(url + "");
+            response = await httpClient.DeleteAsync(url + $"/{fundraiserIdToDelete}");
 
             // Then
             response.EnsureSuccessStatusCode(); // Status Code 200-299
 
+            // And hard delete the fundraiser
+
             // Hard Delete the created fundraiser
-            response = await httpClient.DeleteAsync(url + $"/delete/");
+            response = await httpClient.DeleteAsync(url + $"/delete/{fundraiserIdToDelete}");
 
             // Then
             response.EnsureSuccessStatusCode(); // Status Code 200-299

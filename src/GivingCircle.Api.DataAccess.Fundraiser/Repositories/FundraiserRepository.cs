@@ -51,10 +51,16 @@ namespace GivingCircle.Api.Fundraiser.DataAccess
                 firstFilter = false;
             }
 
+            // woudld actually like to build a query string like [@Tag1, @Tag2]
+
             // Tags filter
             if (filterProps.ContainsKey("Tags"))
             {
-                string queryTags = string.Empty;
+                // The list of query tags
+                List<string> queryTags = new();
+
+                // The individual query tags
+                string queryTag;
 
                 // Add the tags to a string to be used as a query parameter
                 for (int i = 0; i < filterProps["Tags"].Length; i++)
@@ -62,11 +68,13 @@ namespace GivingCircle.Api.Fundraiser.DataAccess
                     // Check that we're not on the last tag for commas
                     if (i != filterProps["Tags"].Length - 1)
                     {
-                        queryTags += filterProps["Tags"].ElementAt(i) + ", ";
+                        queryTag = filterProps["Tags"].ElementAt(i);
+                        queryTags.Add(queryTag.Trim());
                     }
                     else
                     {
-                        queryTags += filterProps["Tags"].ElementAt(i);
+                        queryTag = filterProps["Tags"].ElementAt(i);
+                        queryTags.Add(queryTag.Trim());
                     }
                 }
 
