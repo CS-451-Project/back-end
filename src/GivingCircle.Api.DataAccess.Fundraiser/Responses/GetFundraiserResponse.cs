@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GivingCircle.Api.Fundraiser.DataAccess.Responses
+namespace GivingCircle.Api.DataAccess.Fundraisers.Responses
 {
     public class GetFundraiserResponse
     {

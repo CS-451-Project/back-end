@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GivingCircle.Api.Fundraiser.Models.Models
+namespace GivingCircle.Api.Models
 {
     public class BankAccount
     {

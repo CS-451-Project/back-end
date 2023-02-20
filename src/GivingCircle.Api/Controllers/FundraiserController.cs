@@ -1,5 +1,6 @@
-﻿using GivingCircle.Api.Fundraiser.DataAccess;
-using GivingCircle.Api.Fundraiser.DataAccess.Responses;
+﻿using GivingCircle.Api.DataAccess.Fundraisers.Repositories;
+using GivingCircle.Api.DataAccess.Fundraisers.Responses;
+using GivingCircle.Api.Models;
 using GivingCircle.Api.Requests;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -168,7 +169,7 @@ namespace GivingCircle.Api.Controllers
                 // Note that we're not setting the GoalReachedDate or the ClosedDate
                 // because they haven't happened yet.
                 // Create the fundraiser object to be inserted 
-                Fundraiser.Models.Fundraiser fundraiser = new()
+                Fundraiser fundraiser = new()
                 {
                     FundraiserId = fundraiserId,
                     OrganizerId = request.OrganizerId,
@@ -218,7 +219,7 @@ namespace GivingCircle.Api.Controllers
                 // Note that we're not setting the GoalReachedDate or the ClosedDate
                 // because they haven't happened yet.
                 // Create the fundraiser object to be inserted 
-                Fundraiser.Models.Fundraiser fundraiser = new()
+                Fundraiser fundraiser = new()
                 {
                     Description = request.Description,
                     Title = request.Title,

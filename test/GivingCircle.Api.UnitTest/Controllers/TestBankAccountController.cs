@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GivingCircle.Api.UnitTest.Controllers
 {
-    internal class TestBankAccountController
+    public class TestBankAccountController
     {
     }
 }

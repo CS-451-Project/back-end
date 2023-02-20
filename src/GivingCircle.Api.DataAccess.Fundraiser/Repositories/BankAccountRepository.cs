@@ -1,13 +1,9 @@
 ﻿using GivingCircle.Api.DataAccess.Client;
-using GivingCircle.Api.Fundraiser.Models;
-using GivingCircle.Api.Fundraiser.Models.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using GivingCircle.Api.Models;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GivingCircle.Api.Fundraiser.DataAccess.Repositories
+namespace GivingCircle.Api.DataAccess.Fundraisers.Repositories
 {
     public class BankAccountRepository : IBankAccountRepository
     {

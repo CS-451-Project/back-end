@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GivingCircle.Api.DataAccess\GivingCircle.Api.DataAccess.csproj" />
-    <ProjectReference Include="..\GivingCircle.Api.Models\GivingCircle.Api.Fundraiser.Models.csproj" />
+    <ProjectReference Include="..\GivingCircle.Api.Models\GivingCircle.Api.Models.csproj" />
   </ItemGroup>
 
 </Project>

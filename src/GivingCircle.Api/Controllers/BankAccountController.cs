@@ -1,9 +1,6 @@
-﻿using GivingCircle.Api.Fundraiser.DataAccess;
-using GivingCircle.Api.Fundraiser.DataAccess.Repositories;
-using GivingCircle.Api.Fundraiser.Models;
-using GivingCircle.Api.Fundraiser.Models.Models;
+﻿using GivingCircle.Api.DataAccess.Fundraisers.Repositories;
+using GivingCircle.Api.Models;
 using GivingCircle.Api.Requests.FundraiserService;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -13,8 +10,7 @@ namespace GivingCircle.Api.Controllers
 {
     [ApiController]
     [Route("api/fundraisers/bankaccount")]
-
-
+    
     public class BankAccountController : ControllerBase
     {
         private readonly ILogger<BankAccountController> _logger;
