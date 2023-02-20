@@ -1,5 +1,4 @@
 ﻿using GivingCircle.Api.Fundraiser.DataAccess;
-using GivingCircle.Api.Fundraiser.DataAccess.Exceptions;
 using GivingCircle.Api.Fundraiser.DataAccess.Repositories;
 using GivingCircle.Api.Fundraiser.Models;
 using GivingCircle.Api.Fundraiser.Models.Models;
@@ -57,7 +56,7 @@ namespace GivingCircle.Api.Controllers
 
                 result = await _bankAccountRepository.AddBankAccount(addBankAccount);
             }
-            catch (BankAccountIdInvalidException err)
+            catch (Exception err)
             {
                 _logger.LogError(err.Message);
                 return StatusCode(500, err.Message);
