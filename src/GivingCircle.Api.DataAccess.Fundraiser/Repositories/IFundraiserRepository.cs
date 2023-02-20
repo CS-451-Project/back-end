@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using GivingCircle.Api.Fundraiser.DataAccess.Responses;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace GivingCircle.Api.Fundraiser.DataAccess
@@ -10,10 +11,19 @@ namespace GivingCircle.Api.Fundraiser.DataAccess
         /// </summary>
         /// <param name="userId">The users id</param>
         /// <returns>A list of fundraisers, if any</returns>
-        Task<IEnumerable<Models.Fundraiser>> ListFundraisersByUserIdAsync(string userId);
+        Task<IEnumerable<GetFundraiserResponse>> ListFundraisersByUserIdAsync(string userId);
 
-        // TODO: Figure this out 
-        Task<IEnumerable<Models.Fundraiser>> FilterFundraisersAsync();
+        /// <summary>
+        /// Sorts and filters fundraisers based on various criteria
+        /// 
+        /// Filter properties are title, tags, created date, end date
+        /// 
+        /// Order by properties are title, created date, planned end date, and by
+        /// how close to the target goal the fundraiser is
+        /// </summary>
+        /// <param name="filterProps">The filter props</param>
+        /// <returns>A list of fundraisers sorted and filtered by the given criteria</returns>
+        Task<IEnumerable<GetFundraiserResponse>> FilterFundraisersAsync(Dictionary<string, string[]> filterProps);
 
         /// <summary>
         /// Creates a fundraiser
@@ -25,15 +35,25 @@ namespace GivingCircle.Api.Fundraiser.DataAccess
         /// <summary>
         /// Updates the fundraiser using the given object
         /// </summary>
+        /// <param name="fundraiserId">The fundraiser's id</param>
         /// <param name="fundraiser">The fundraiser to update to</param>
         /// <returns>True if success, false or an error if un successful</returns>
-        Task<bool> UpdateFundraiserAsync(Models.Fundraiser fundraiser);
+        Task<bool> UpdateFundraiserAsync(string fundraiserId, Models.Fundraiser fundraiser);
 
         /// <summary>
-        /// Deletes a fundraiser
+        /// Deletes a fundraiser. Note that we perform a "soft delete", where the fundraiser isn't
+        /// actually physically deleted, but we set the closed_date to a non null value to indicate that
+        /// it is terminated.
         /// </summary>
         /// <param name="fundraiserId">The fundraiser's id</param>
-        /// <returns>True if success, false or an error if not</returns>
+        /// <returns>True if success, else false or an error</returns>
         Task<bool> DeleteFundraiserAsync(string fundraiserId);
+
+        /// <summary>
+        /// Permanently deletes a fundraiser
+        /// </summary>
+        /// <param name="fundraiserId">The fundraiser's id</param>
+        /// <returns>True if success, else false if an error</returns>
+        Task<bool> HardDeleteFundraiserAsync(string fundraiserId);
     }
 }
