@@ -48,7 +48,6 @@ var builder = WebApplication.CreateBuilder(args);
 
     // Register validators
     services.AddSingleton<IValidator<Fundraiser>, FundraiserValidator>();
-    services.AddSingleton<IValidator<AddBankAccountRequest>, AddBankAccountRequestValidator>();
 }
 
 var app = builder.Build();

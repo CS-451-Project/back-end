@@ -5,26 +5,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Services\**" />
-    <Content Remove="Services\**" />
-    <EmbeddedResource Remove="Services\**" />
-    <None Remove="Services\**" />
-  </ItemGroup>
-	
-  <ItemGroup>
     <PackageReference Include="Dapper" Version="2.0.123" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.2.2" />
     <PackageReference Include="Npgsql" Version="7.0.1" />
+    <PackageReference Include="System.Linq" Version="4.3.0" />
   </ItemGroup>
 	
   <ItemGroup>
     <ProjectReference Include="..\GivingCircle.Api.DataAccess.Fundraiser\GivingCircle.Api.Fundraiser.DataAccess.csproj" />
     <ProjectReference Include="..\GivingCircle.Api.DataAccess\GivingCircle.Api.DataAccess.csproj" />
     <ProjectReference Include="..\GivingCircle.Api.Models\GivingCircle.Api.Fundraiser.Models.csproj" />
-  </ItemGroup>
-	
-  <ItemGroup>
-    <Folder Include="Exceptions\" />
   </ItemGroup>
 
 </Project>
