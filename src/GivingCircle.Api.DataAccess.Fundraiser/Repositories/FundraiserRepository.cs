@@ -201,6 +201,46 @@ namespace GivingCircle.Api.Fundraiser.DataAccess
             return (createdResult == 1);
         }
 
+        public async Task<bool> UpdateFundraiserAsync(string fundraiserId, Models.Fundraiser fundraiser)
+        {
+            // The string builder
+            StringBuilder queryBuilder = new();
+
+            // This represents the number of rows effected by our query
+            int updatedResult;
+
+            // The dynamic parameters bag
+            Dictionary<string, object> parametersDictionary = new()
+            {
+                { "@PictureId",  fundraiser.PictureId },
+                { "@Description",  fundraiser.Description },
+                { "@Title", fundraiser.Title}, 
+                { "@PlannedEndDate", fundraiser.PlannedEndDate },
+                { "@GoalTargetAmount", fundraiser.GoalTargetAmount },
+                { "@Tags", fundraiser.Tags },
+                { "@FundraiserId", fundraiserId }
+            };
+
+            // The query parameters
+            DynamicParameters parameters = new(parametersDictionary);
+
+            // Build the query
+            var query = queryBuilder
+                .Append($"UPDATE {_tableName} ")
+                .Append("SET description = @Description, ")
+                .Append("title = @Title, ")
+                .Append("planned_end_date = @PlannedEndDate, ")
+                .Append("goal_target_amount = @GoalTargetAmount, ")
+                .Append("tags = @Tags ")
+                .Append("WHERE fundraiser_id = @FundraiserId ")
+                .ToString();
+
+            updatedResult = await _postgresClient.ExecuteAsync(query, parameters);
+
+            // If we created 1 new fundraiser then we succeeded
+            return (updatedResult == 1);
+        }
+
         public async Task<bool> DeleteFundraiserAsync(string fundraiserId)
         {
             // The query string builder
@@ -230,7 +270,7 @@ namespace GivingCircle.Api.Fundraiser.DataAccess
             return (deletedResult == 1);
         }
 
-        public async Task<bool> HardDeleteUserFundraiserAsync(string fundraiserId)
+        public async Task<bool> HardDeleteFundraiserAsync(string fundraiserId)
         {
             // The query string builder
             StringBuilder queryBuilder = new();
@@ -248,11 +288,6 @@ namespace GivingCircle.Api.Fundraiser.DataAccess
             await _postgresClient.ExecuteAsync(query, parameters);
 
             return true;
-        }
-
-        public Task<bool> UpdateFundraiserAsync(Models.Fundraiser fundraiser)
-        {
-            throw new NotImplementedException();
         }
     }
 }

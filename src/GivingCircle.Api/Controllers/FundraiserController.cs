@@ -198,6 +198,48 @@ namespace GivingCircle.Api.Controllers
         }
 
         /// <summary>
+        /// Updates a fundraiser. Note that for a put request we are taking in all of the parameters that are
+        /// open to change, and PUTTING that whole object back onto that fundraiser
+        /// 
+        /// Updatable fields in this endpoint are: descrription, title, planned end date, goal target amount, and tags
+        /// </summary>
+        /// <param name="request" <see cref="UpdateFundraiserRequest"/>>The update fundraiser request</param>
+        /// <returns>Status(200) if successful, failure codes otherwise</returns>
+        [HttpPut]
+        public async Task<IActionResult> UpdateFundraiser([FromBody] UpdateFundraiserRequest request)
+        {
+            // True if successfully updated, false if there was an issue
+            bool updateFundraiserResult;
+
+            try
+            {
+                // Try to parse the given planned end date
+                var plannedEndDateParsed = DateTime.Parse(request.PlannedEndDate);
+
+                // Note that we're not setting the GoalReachedDate or the ClosedDate
+                // because they haven't happened yet.
+                // Create the fundraiser object to be inserted 
+                Fundraiser.Models.Fundraiser fundraiser = new()
+                {
+                    Description = request.Description,
+                    Title = request.Title,
+                    PlannedEndDate = plannedEndDateParsed,
+                    GoalTargetAmount = request.GoalTargetAmount,
+                    Tags = request.Tags
+                };
+
+                updateFundraiserResult = await _fundraiserRepository.UpdateFundraiserAsync(request.FundraiserId, fundraiser);
+            }
+            catch (Exception err)
+            {
+                _logger.LogError("Error updating fundraiser", err);
+                return StatusCode(500, "Something went wrong");
+            }
+
+            return (updateFundraiserResult) ? StatusCode(200) : StatusCode(500, "Something went wrong");
+        }
+
+        /// <summary>
         /// Deletes a single fundraiser. Note that we do a "soft delete", and so the fundraiser isn't physically
         /// deleted. We set the closed_date to a non null value to indicate deletion.
         /// </summary>
@@ -246,7 +288,7 @@ namespace GivingCircle.Api.Controllers
         /// <param name="fundraiserId">The fundraiser's id</param>
         /// <returns>Status 200 if success, error codes if failure</returns>
         [HttpDelete("delete/{fundraiserId}")]
-        public async Task<IActionResult> HardDeleteUserFundraiser(string fundraiserId)
+        public async Task<IActionResult> HardDeleteFundraiser(string fundraiserId)
         {
             // The deleted result. True if success, false if errors
             bool deletedFundraiserResult;
@@ -256,7 +298,7 @@ namespace GivingCircle.Api.Controllers
                 // Validate the given id
                 Guid.Parse(fundraiserId);
 
-                deletedFundraiserResult = await _fundraiserRepository.HardDeleteUserFundraiserAsync(fundraiserId);
+                deletedFundraiserResult = await _fundraiserRepository.HardDeleteFundraiserAsync(fundraiserId);
             }
             catch (System.FormatException err)
             {

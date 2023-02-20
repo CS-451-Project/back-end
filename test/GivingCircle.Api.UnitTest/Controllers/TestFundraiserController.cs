@@ -15,6 +15,12 @@ namespace GivingCircle.Api.UnitTest.Controllers
     public class TestFundraiserController
     {
         [Fact]
+        public async void TestUpdateFundraiserHappyPath()
+        {
+
+        }
+
+        [Fact]
         public async void TestFilterFundraisersHappyPath()
         {
             // Given
@@ -78,7 +84,6 @@ namespace GivingCircle.Api.UnitTest.Controllers
             Assert.Equal(StatusCodes.Status200OK, result.StatusCode);
         }
 
-
         [Fact]
         public async void TestListFundraisersByUserIdHappyPath()
         {
@@ -135,10 +140,34 @@ namespace GivingCircle.Api.UnitTest.Controllers
         }
 
         [Fact]
+        public async void TestHardDeleteFundraisersHappyPath()
+        {
+            // Given
+            var fundraiserId = Guid.NewGuid().ToString();
+
+            var fundraiserRepositoryMock = new Mock<IFundraiserRepository>();
+            fundraiserRepositoryMock.Setup(r => r.HardDeleteFundraiserAsync(It.IsAny<string>()))
+                .ReturnsAsync(true);
+
+            var loggerMock = new Mock<ILogger<FundraiserController>>();
+
+            var controllerMock = new FundraiserController(
+                loggerMock.Object,
+                fundraiserRepositoryMock.Object
+                );
+
+            // When
+            var result = await controllerMock.HardDeleteFundraiser(fundraiserId) as StatusCodeResult;
+
+            // Then
+            Assert.Equal(StatusCodes.Status200OK, result.StatusCode);
+        }
+
+        [Fact]
         public async void TestDeleteFundraiserHappyPath()
         {
             // Given
-            var userId = Guid.NewGuid().ToString();
+            var fundraiserId = Guid.NewGuid().ToString();
 
             var fundraiserRepositoryMock = new Mock<IFundraiserRepository>();
             fundraiserRepositoryMock.Setup(r => r.DeleteFundraiserAsync(It.IsAny<string>()))
@@ -152,7 +181,7 @@ namespace GivingCircle.Api.UnitTest.Controllers
                 );
 
             // When
-            var result = await controllerMock.DeleteFundraiser(userId) as StatusCodeResult;
+            var result = await controllerMock.DeleteFundraiser(fundraiserId) as StatusCodeResult;
 
             // Then
             Assert.Equal(StatusCodes.Status200OK, result.StatusCode);

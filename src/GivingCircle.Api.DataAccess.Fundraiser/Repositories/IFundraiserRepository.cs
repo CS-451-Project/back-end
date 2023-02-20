@@ -35,9 +35,10 @@ namespace GivingCircle.Api.Fundraiser.DataAccess
         /// <summary>
         /// Updates the fundraiser using the given object
         /// </summary>
+        /// <param name="fundraiserId">The fundraiser's id</param>
         /// <param name="fundraiser">The fundraiser to update to</param>
         /// <returns>True if success, false or an error if un successful</returns>
-        Task<bool> UpdateFundraiserAsync(Models.Fundraiser fundraiser);
+        Task<bool> UpdateFundraiserAsync(string fundraiserId, Models.Fundraiser fundraiser);
 
         /// <summary>
         /// Deletes a fundraiser. Note that we perform a "soft delete", where the fundraiser isn't
@@ -53,6 +54,6 @@ namespace GivingCircle.Api.Fundraiser.DataAccess
         /// </summary>
         /// <param name="fundraiserId">The fundraiser's id</param>
         /// <returns>True if success, else false if an error</returns>
-        Task<bool> HardDeleteUserFundraiserAsync(string fundraiserId);
+        Task<bool> HardDeleteFundraiserAsync(string fundraiserId);
     }
 }
