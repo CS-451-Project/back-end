@@ -10,9 +10,7 @@ using System.Threading.Tasks;
 
 namespace GivingCircle.Api.Fundraiser.DataAccess
 {
-    /// <summary>
-    /// A class to manage access to the fundraisers database
-    /// </summary>
+    /// <inheritdoc />
     public class FundraiserRepository : IFundraiserRepository
     {
         private readonly PostgresClient _postgresClient;
@@ -28,11 +26,15 @@ namespace GivingCircle.Api.Fundraiser.DataAccess
             _postgresClient = postgresClient;
         }
 
-        /// <inheritdoc/>
         public async Task<IEnumerable<GetFundraiserResponse>> FilterFundraisersAsync(Dictionary<string, string[]> filterProps)
         {
-            IEnumerable<GetFundraiserResponse> fundraisers = Enumerable.Empty<GetFundraiserResponse>();
+            // The returned fundraisers
+            IEnumerable<GetFundraiserResponse> fundraisers;
+
+            // The query parameters
             DynamicParameters parameters = new();
+
+            // Whether or not the filter encountered is the first to be added or not
             bool firstFilter = true;
 
             // Start the query
@@ -41,7 +43,7 @@ namespace GivingCircle.Api.Fundraiser.DataAccess
             // Title filter
             if (filterProps.ContainsKey("Title"))
             {
-                // Search if the title column contains our title search filter
+                // Search if the title column contains our title search filter string
                 query += $"WHERE position(lower(@TitleSearchText) in lower(title))>0 ";
 
                 parameters.Add("@TitleSearchText", filterProps["Title"].ElementAt(0));
@@ -70,22 +72,25 @@ namespace GivingCircle.Api.Fundraiser.DataAccess
 
                 parameters.Add("@TagFilters", queryTags);
 
-                // Whether this part of the query should have an AND or not
-                var and = firstFilter ? "WHERE" : "AND";
+                // Whether this part of the query should have an AND or a WHERE
+                var whereOrAndClause = firstFilter ? "WHERE" : "AND";
 
                 // Check if our tags overlap with any others in the tag column
-                query += $"{and} ARRAY[@TagFilters] && tags ";
+                query += $"{whereOrAndClause} ARRAY[@TagFilters] && tags ";
 
                 firstFilter = false;
             }
 
             // Created Date offset filter
+            // We select based on whether or not the created_date for a fundraiser
+            // is within the span of days that we pass in. Eg created within the last
+            // 7 days.
             if (filterProps.ContainsKey("CreatedDateOffset"))
             {
                 // Whether this part of the query should have an AND or not
-                var and = firstFilter ? "WHERE" : "AND";
+                var whereOrAndClause = firstFilter ? "WHERE" : "AND";
 
-                query += $"{and} created_date > @CreatedDateOffset ";
+                query += $"{whereOrAndClause} created_date > @CreatedDateOffset ";
 
                 parameters.Add("@CreatedDateOffset", DateTime.Parse(filterProps["CreatedDateOffset"].ElementAt(0)));
 
@@ -93,23 +98,27 @@ namespace GivingCircle.Api.Fundraiser.DataAccess
             }
 
             // Planned End Date offset filter
+            // We select based on whether or not the planned_end_date for a fundraiser
+            // is within the span of days that we pass in. Eg ending within the next
+            // 30 days.
             if (filterProps.ContainsKey("EndDateOffset"))
             {
-                // Whether this part of the query should have an AND or not
-                var and = firstFilter ? "WHERE" : "AND";
+                // Whether this part of the query should have an AND or a WHERE
+                var whereOrAndClause = firstFilter ? "WHERE" : "AND";
 
-                query += $"{and} planned_end_date < @EndDateOffset ";
+                query += $"{whereOrAndClause} planned_end_date < @EndDateOffset ";
 
                 parameters.Add("@EndDateOffset", DateTime.Parse(filterProps["EndDateOffset"].ElementAt(0)));
 
                 firstFilter= false;
             }
 
-            // Check that the fundraisers aren't closed
+            // Check that the fundraisers aren't closed. Closed being "deleted" / hidden from the public eye.
             query += firstFilter ? "WHERE closed_date IS NULL " : "AND closed_date IS NULL ";
 
-            // Order by and ascending or descending
-            // Note that dapper doesn't like using dynamic parameters for the ORDER BY and ASC clauses
+            // Order by whereOrAndClause ascending or descending
+            // Note that dapper doesn't like using dynamic parameters for the ORDER BY whereOrAndClause ASC clauses, whereOrAndClause so the 
+            // parameters were added through string interpolation
             if (filterProps.ContainsKey("OrderBy") && filterProps["OrderBy"].ElementAt(0) != "current_balance_amount")
             {
                 var orderBy = filterProps["OrderBy"].ElementAt(0);
@@ -120,7 +129,9 @@ namespace GivingCircle.Api.Fundraiser.DataAccess
             // Logic for when we want to order by the fundraisers that are closest to their target goal
             else if (filterProps.ContainsKey("OrderBy") && filterProps["OrderBy"].ElementAt(0) == "current_balance_amount")
             {
+                var ascending = filterProps["Ascending"].ElementAt(0);
 
+                query += $"ORDER BY (goal_target_amount - current_balance_amount) {ascending}";
             }
             // Default to ordering by title ascending if nothing specified
             else
@@ -129,24 +140,20 @@ namespace GivingCircle.Api.Fundraiser.DataAccess
             }
 
             // Execute the query on the database
-            try
-            {
-                fundraisers = await _postgresClient.QueryAsync<GetFundraiserResponse>(query, parameters);
-            }
-            catch (Exception err)
-            {
-                Console.WriteLine(err.Message);
-                throw;
-            }
+            fundraisers = await _postgresClient.QueryAsync<GetFundraiserResponse>(query, parameters);
 
             return fundraisers ?? Enumerable.Empty<GetFundraiserResponse>();
         }
 
-        /// <inheritdoc/>
         public async Task<IEnumerable<GetFundraiserResponse>> ListFundraisersByUserIdAsync(string userId)
         {
+            // The fundraisers to be returned
             IEnumerable<GetFundraiserResponse> fundraisers;
+
+            // The query string builder
             StringBuilder queryBuilder = new();
+
+            // The parameters to be given to the query
             DynamicParameters parameters = new ();
 
             parameters.Add("@UserId", userId);
@@ -158,16 +165,17 @@ namespace GivingCircle.Api.Fundraiser.DataAccess
                 .Append("AND closed_date IS NULL")
                 .ToString();
             
-            // Execute the query on the database
             fundraisers = await _postgresClient.QueryAsync<GetFundraiserResponse>(query, parameters);
 
             return fundraisers ?? Enumerable.Empty<GetFundraiserResponse>();
         }
 
-        /// <inheritdoc/>
         public async Task<bool> CreateFundraiserAsync(Models.Fundraiser fundraiser)
         {
+            // The string builder
             StringBuilder queryBuilder = new();
+
+            // This represents the number of rows effected by our query
             int createdResult;
 
             // Construct the query
@@ -179,62 +187,41 @@ namespace GivingCircle.Api.Fundraiser.DataAccess
                 .Append("@CreatedDate,@PlannedEndDate, @GoalReachedDate, @ClosedDate, @GoalTargetAmount, @CurrentBalanceAmount, @Tags)")
                 .ToString();
 
-            try
-            {
-                // Execute the query on the database
-                createdResult = await _postgresClient.ExecuteAsync(query, fundraiser);
-            }
-            catch (Npgsql.PostgresException err)
-            {
-                // 23503 is the error code thrown when we violate referential integrity
-                if (err.SqlState == "23503")
-                {
-                    throw new InvalidBankAccountIdException("Bank account id is invalid or DNE");
-                }
-                return false;
-            }
+            createdResult = await _postgresClient.ExecuteAsync(query, fundraiser);
 
             // If we created 1 new fundraiser then we succeeded
             return (createdResult == 1);
         }
 
-        /// <inheritdoc/>
         public async Task<bool> DeleteFundraiserAsync(string fundraiserId)
         {
+            // The query string builder
             StringBuilder queryBuilder = new();
+
+            // The dynamic parameters to be supplied to the query
             DynamicParameters parameters = new();
+
+            // This represents the number of rows effected by our query
+            int deletedResult;
+
+            // Generate todays date
             DateTime closedDate = DateTime.Now;
 
             parameters.Add("@ClosedDate", closedDate);
             parameters.Add("@FundraiserId", fundraiserId);
 
-            //var query = queryBuilder
-            //    .Append($"DELETE FROM {_tableName} ")
-            //    .Append("WHERE fundraiser_id=@FundraiserId")
-            //    .ToString();
-
+            // Build the query
             var query = queryBuilder
                 .Append($"UPDATE {_tableName} ")
                 .Append("SET closed_date = @ClosedDate ")
                 .Append("WHERE fundraiser_id = @FundraiserId")
                 .ToString();
 
-            try
-            {
-                // Note that no int is being detected. Because this is a distributed system,
-                // we don't check for rows deleted because someone else may have already deleted the item
-                await _postgresClient.ExecuteAsync(query, parameters);
-            }
-            catch (Exception err)
-            {
-                Console.WriteLine(err.Message);
-                return false;
-            }
+            deletedResult = await _postgresClient.ExecuteAsync(query, parameters);
 
-            return true;
+            return (deletedResult == 1);
         }
 
-        /// <inheritdoc/>
         public Task<bool> UpdateFundraiserAsync(Models.Fundraiser fundraiser)
         {
             throw new NotImplementedException();

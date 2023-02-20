@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace GivingCircle.Api.Controllers
@@ -36,6 +35,7 @@ namespace GivingCircle.Api.Controllers
         [HttpGet("{userId}")]
         public async Task<IActionResult> ListFundraisersByUserId(string userId)
         {
+            // The fundraisers to return
             IEnumerable<GetFundraiserResponse> fundraisers;
 
             try
@@ -47,12 +47,12 @@ namespace GivingCircle.Api.Controllers
             }
             catch (System.FormatException err)
             {
-                _logger.LogError(err.Message);
+                _logger.LogError("Error listing fundraisers by user", err);
                 return BadRequest("Invalid id");
             }
             catch (Exception err)
             {
-                _logger.LogError(err.Message);
+                _logger.LogError("Error listing fundraisers by user", err);
                 return StatusCode(500, "Something went wrong");
             }
 
@@ -60,15 +60,20 @@ namespace GivingCircle.Api.Controllers
         }
 
         /// <summary>
-        /// Filters fundraiasers based on various criteria
+        /// Filters fundraisers based on various criteria
+        /// 
+        /// Filter properties are title, tags, created date, end date
+        /// 
+        /// Order by properties are title, created date, planned end date, and by
+        /// how close to the target goal the fundraiser is
         /// </summary>
-        /// <param name="filterProps">The filter properties</param>
-        /// <returns>A list of filtered fundraisers</returns>
+        /// <param name="filterPropsRequest">The filter properties</param>
+        /// <returns>A list of sorted and filtered fundraisers</returns>
         [HttpPost("filter")]
-        public async Task<IActionResult> FilterFundraisers([FromBody] FilterFundraisersRequest filterProps)
+        public async Task<IActionResult> FilterFundraisers([FromBody] FilterFundraisersRequest filterPropsRequest)
         {
-            // The valid order by columns. Used to map given val to table column name
-            Dictionary<string, string> orderByColumns = new()
+            // The valid order by columns. Used to map given val to table column name / order by method
+            Dictionary<string, string> orderByClauseProps = new()
             {
                 { "Title", "title" },
                 { "CreatedDate", "created_date" },
@@ -82,48 +87,51 @@ namespace GivingCircle.Api.Controllers
             // The filter props to supply the repository with
             Dictionary<string, string[]> dbFilterProps = new ();
 
-            // Check the title props
-            if (filterProps.Title != null)
-            {
-                dbFilterProps.Add(nameof(filterProps.Title), new string[] { filterProps.Title });
-            }
-
-            // Check the tag props
-            if (filterProps.Tags != null)
-            {
-                dbFilterProps.Add(nameof(filterProps.Tags), filterProps.Tags);
-            }
-
-            // Check the created date props
-            if (filterProps.CreatedDateOffset > 0.0)
-            {
-                // Add a negative value to today to find the date time to use to compare against the db column
-                DateTime createdDataFilter = DateTime.Now.AddDays(-Math.Abs(filterProps.CreatedDateOffset));
-                dbFilterProps.Add(nameof(filterProps.CreatedDateOffset), new string[] { createdDataFilter.ToString() });
-            }
-
-            // Check the end date props
-            if (filterProps.EndDateOffset > 0.0)
-            {
-                // Add a positive value to today to find the date time to use to compare against the db column
-                DateTime endDateFilter = DateTime.Now.AddDays(Math.Abs(filterProps.EndDateOffset));
-                dbFilterProps.Add(nameof(filterProps.EndDateOffset), new string[] { endDateFilter.ToString() });
-            }
-
-            // Check if there is an order by prop and for ascending or descending or for the closest to target goal
-            if (filterProps.OrderBy != null && orderByColumns.ContainsKey(filterProps.OrderBy))
-            {
-                dbFilterProps.Add(nameof(filterProps.OrderBy), new string[] { orderByColumns[filterProps.OrderBy] });
-                dbFilterProps.Add(nameof(filterProps.Ascending), new string[] { filterProps.Ascending ? "ASC" : "DESC" });
-            }
-
             try
             {
+                // Check for the title props, add if they exist
+                if (filterPropsRequest.Title != null)
+                {
+                    dbFilterProps.Add(nameof(filterPropsRequest.Title), new string[] { filterPropsRequest.Title });
+                }
+
+                // Check for the tag props, add if they exist
+                if (filterPropsRequest.Tags != null)
+                {
+                    dbFilterProps.Add(nameof(filterPropsRequest.Tags), filterPropsRequest.Tags);
+                }
+
+                // Check for the created date props, calculate offset and add if they exist
+                if (filterPropsRequest.CreatedDateOffset > 0.0)
+                {
+                    // Add a negative value to today to find the date time to use to compare against the db column
+                    DateTime createdDataFilter = DateTime.Now.AddDays(-Math.Abs(filterPropsRequest.CreatedDateOffset));
+
+                    dbFilterProps.Add(nameof(filterPropsRequest.CreatedDateOffset), new string[] { createdDataFilter.ToString() });
+                }
+
+                // Check for the end date props, calculate offset and add if they exist
+                if (filterPropsRequest.EndDateOffset > 0.0)
+                {
+                    // Add a positive value to today to find the date time to use to compare against the db column
+                    DateTime endDateFilter = DateTime.Now.AddDays(Math.Abs(filterPropsRequest.EndDateOffset));
+
+                    dbFilterProps.Add(nameof(filterPropsRequest.EndDateOffset), new string[] { endDateFilter.ToString() });
+                }
+
+                // Check for the order by prop, add if they exist. Note that we can order by certain column names, and by being closest to the
+                // target goal.
+                if (filterPropsRequest.OrderBy != null && orderByClauseProps.ContainsKey(filterPropsRequest.OrderBy))
+                {
+                    dbFilterProps.Add(nameof(filterPropsRequest.OrderBy), new string[] { orderByClauseProps[filterPropsRequest.OrderBy] });
+                    dbFilterProps.Add(nameof(filterPropsRequest.Ascending), new string[] { filterPropsRequest.Ascending ? "ASC" : "DESC" });
+                }
+
                 fundraisers = await _fundraiserRepository.FilterFundraisersAsync(dbFilterProps);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message, ex);
+                _logger.LogError("Error filtering fundraisers", ex);
                 return StatusCode(500, "Something went wrong");
             }
 
@@ -131,28 +139,36 @@ namespace GivingCircle.Api.Controllers
         }
 
         /// <summary>
-        /// Create fundraiser
+        /// Creates a fundraiser.
         /// </summary>
         /// <param name="request">The create fundraiser request <see cref="CreateFundraiserRequest"/></param>
         /// <returns>Status(201) if successful, failure codes otherwise</returns>
         [HttpPost]
         public async Task<IActionResult> CreateFundraiser([FromBody] CreateFundraiserRequest request)
         {
+            // True if successfully created, false if there was an issue
             bool createdFundraiserResult;
 
             try
             {
+                // Generate fundraiser id
                 var fundraiserId = Guid.NewGuid().ToString();
+
+                // Generate todays date
                 var createdDate = DateTime.Now;
+
+                // Assign the description if there is one
                 var description = request.Description ?? "";
+
+                // Initialize the starting balance
                 var currentBalanceAmount = 0.0;
 
                 // Try to parse the given planned end date
                 var plannedEndDateParsed = DateTime.Parse(request.PlannedEndDate);
 
                 // Note that we're not setting the GoalReachedDate or the ClosedDate
-                // because they haven't happened yet. They'll be created as null in the db this way.
-                // Can't set a date time object to null so have to do it that way.
+                // because they haven't happened yet.
+                // Create the fundraiser object to be inserted 
                 Fundraiser.Models.Fundraiser fundraiser = new()
                 {
                     FundraiserId = fundraiserId,
@@ -172,14 +188,9 @@ namespace GivingCircle.Api.Controllers
 
                 createdFundraiserResult = await _fundraiserRepository.CreateFundraiserAsync(fundraiser);
             }
-            catch (InvalidBankAccountIdException err)
-            {
-                _logger.LogError(err.Message);
-                return StatusCode(500, err.Message);
-            }
             catch (Exception err)
             {
-                _logger.LogError(err.Message);
+                _logger.LogError("Error creating fundraiser", err);
                 return StatusCode(500, "Something went wrong");
             }
 
@@ -195,23 +206,25 @@ namespace GivingCircle.Api.Controllers
         [HttpDelete("{fundraiserId}")]
         public async Task<IActionResult> DeleteFundraiser(string fundraiserId)
         {
+            // The deleted result. True if success, false if errors
             bool deletedFundraiserResult;
 
             try
             {
+                // Validate the given id
                 Guid.Parse(fundraiserId);
 
                 deletedFundraiserResult = await _fundraiserRepository.DeleteFundraiserAsync(fundraiserId);
             }
             catch (System.FormatException err)
             {
-                _logger.LogError(err.Message);
+                _logger.LogError("Error deleting fundraiser", err);
                 return BadRequest("Invalid id");
             }
             catch (Exception err)
             {
-                _logger.LogError(err.Message);
-                return StatusCode(500);
+                _logger.LogError("Error deleting fundraiser", err);
+                return StatusCode(500, "Something went wrong");
             }
 
             if (deletedFundraiserResult)

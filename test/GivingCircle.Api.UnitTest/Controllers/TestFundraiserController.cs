@@ -8,7 +8,6 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using System;
 using System.Collections.Generic;
-using System.Net;
 using Xunit;
 
 namespace GivingCircle.Api.UnitTest.Controllers
@@ -19,13 +18,50 @@ namespace GivingCircle.Api.UnitTest.Controllers
         public async void TestFilterFundraisersHappyPath()
         {
             // Given
-            FilterFundraisersRequest filterPropsRequest = new()
+            FilterFundraisersRequest filterFundraisersRequest = new()
             {
                 Title = "test",
-                Tags = new string[] { "environment", "test", "huricane relief" }
+                Tags = new string[] { "environment", "test", "huricane relief" },
+                CreatedDateOffset = 2.0,
+                EndDateOffset = 11.0,
+                OrderBy = "ClosestToTargetGoal",
+                Ascending = true
+            };
+
+            var fundraisers = new List<GetFundraiserResponse>()
+            {
+                new GetFundraiserResponse()
+                {
+                    FundraiserId = Guid.NewGuid().ToString(),
+                    OrganizerId = Guid.NewGuid().ToString(),
+                    PictureId = Guid.NewGuid().ToString(),
+                    Title = "Test title 1",
+                    Description = "test dscription 1",
+                    CreatedDate = DateTime.Now,
+                    PlannedEndDate = DateTime.Now.AddDays(90),
+                    GoalTargetAmount = 9000.0,
+                    CurrentBalanceAmount = 500.0,
+                    Tags = new string[] { "environment", "test tag" }
+                },
+                new GetFundraiserResponse()
+                {
+                    FundraiserId = Guid.NewGuid().ToString(),
+                    OrganizerId = Guid.NewGuid().ToString(),
+                    PictureId = Guid.NewGuid().ToString(),
+                    Title = "Test title 2",
+                    Description = "test dscription 1",
+                    CreatedDate = DateTime.Now,
+                    PlannedEndDate = DateTime.Now.AddDays(90),
+                    GoalTargetAmount = 9000.0,
+                    CurrentBalanceAmount = 500.0,
+                    Tags = new string[] { "test", "test tag" }
+                },
             };
 
             var fundraiserRepositoryMock = new Mock<IFundraiserRepository>();
+            fundraiserRepositoryMock
+                .Setup(x => x.FilterFundraisersAsync(It.IsAny<Dictionary<string, string[]>>()))
+                .ReturnsAsync(fundraisers);
 
             var loggerMock = new Mock<ILogger<FundraiserController>>();
 
@@ -35,9 +71,11 @@ namespace GivingCircle.Api.UnitTest.Controllers
                 );
 
             // When
-            var result = await controllerMock.FilterFundraisers(filterPropsRequest);
+            var result = await controllerMock.FilterFundraisers(filterFundraisersRequest) as OkObjectResult;
 
             // Then
+            Assert.Equal(fundraisers, result.Value);
+            Assert.Equal(StatusCodes.Status200OK, result.StatusCode);
         }
 
 
@@ -93,6 +131,7 @@ namespace GivingCircle.Api.UnitTest.Controllers
 
             // Then
             Assert.Equal(fundraisers, result.Value);
+            Assert.Equal(StatusCodes.Status200OK, result.StatusCode);
         }
 
         [Fact]

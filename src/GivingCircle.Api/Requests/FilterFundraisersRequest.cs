@@ -20,6 +20,8 @@
         public double EndDateOffset { get; set; }
 
         // Represents which column we want to order by / which way
+        // For example we can order by a column like the date, or by which
+        // fundraisers are closet to their target goal
         public string OrderBy { get; set; }
 
         // ASC or DESC. True if ascending
