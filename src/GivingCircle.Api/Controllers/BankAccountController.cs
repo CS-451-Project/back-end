@@ -1,7 +1,9 @@
 ﻿using GivingCircle.Api.Fundraiser.DataAccess;
+using GivingCircle.Api.Fundraiser.DataAccess.Exceptions;
 using GivingCircle.Api.Fundraiser.DataAccess.Repositories;
 using GivingCircle.Api.Fundraiser.Models;
 using GivingCircle.Api.Fundraiser.Models.Models;
+using GivingCircle.Api.Requests.FundraiserService;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -28,9 +30,11 @@ namespace GivingCircle.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddBankAccount([FromBody] BankAccount bankaccount)
+        public async Task<IActionResult> AddBankAccount([FromBody] AddBankAccountRequest bankaccount)
         {
             _logger.LogInformation("Received POST request");
+            var result = false;
+
             try
             {
                 // Create the bank account id
@@ -51,15 +55,16 @@ namespace GivingCircle.Api.Controllers
                     Bank_Account_Id = bankaccountid,
                   };
 
-                var result = await _bankAccountRepository.AddBankAccount(addBankAccount);
+                result = await _bankAccountRepository.AddBankAccount(addBankAccount);
             }
-            catch (Exception err)
+            catch (BankAccountIdInvalidException err)
             {
                 _logger.LogError(err.Message);
+                return StatusCode(500, err.Message);
             }
 
 
-            return Ok();
+            return result ? StatusCode(201) : StatusCode(500);
         }
 
         [HttpGet("{bankAccountId}")]
@@ -70,7 +75,6 @@ namespace GivingCircle.Api.Controllers
             var result = await _bankAccountRepository.GetBankAccount(bankAccountId);
 
             return Ok(result);
-
 
         }
 

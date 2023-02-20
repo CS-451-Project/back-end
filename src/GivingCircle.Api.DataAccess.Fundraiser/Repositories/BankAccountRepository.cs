@@ -1,4 +1,5 @@
 ﻿using GivingCircle.Api.DataAccess.Client;
+using GivingCircle.Api.Fundraiser.Models;
 using GivingCircle.Api.Fundraiser.Models.Models;
 using System;
 using System.Collections.Generic;
@@ -32,17 +33,31 @@ namespace GivingCircle.Api.Fundraiser.DataAccess.Repositories
             object parameters = new { Bank_Account_Id = bankAccountId };
 
             var bankAccount = await _postgresClient.QuerySingleAsync<BankAccount>("SELECT * FROM bank_account WHERE bank_account_id = @Bank_Account_Id", parameters);
-
+            
             return bankAccount;
         }
 
         public async Task<bool> AddBankAccount(BankAccount bankAccount)
         {
             StringBuilder query = new StringBuilder();
+            int createBankAccountResult = 0;
 
-            var createBankAccountResult = await _postgresClient.ExecuteAsync(query
+            //creates the sql string
+            query
                 .Append("INSERT INTO bank_account (account_name, address, city, state, zipcode, bank_name, account_num, routing_num, account_type, bank_account_id) ")
-                .Append("VALUES (@Account_Name, @Address, @City, @State, @Zipcode, @Bank_Name, @Account_Num, @Routing_Num, @Account_Type, @Bank_Account_Id)").ToString(), bankAccount);
+                .Append("VALUES (@Account_Name, @Address, @City, @State, @Zipcode, @Bank_Name, @Account_Num, @Routing_Num, @Account_Type, @Bank_Account_Id)").ToString();
+
+            var querybuild = query.ToString();
+
+            try
+            {
+                // Execute the query on the database
+                createBankAccountResult = await _postgresClient.ExecuteAsync(querybuild, bankAccount);
+            }
+            catch (Npgsql.PostgresException err)
+            {
+
+            }
 
             return createBankAccountResult == 1 ? true : false;
 

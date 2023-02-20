@@ -6,16 +6,19 @@ namespace GivingCircle.Api.Fundraiser.DataAccess.Exceptions
     {
         public BankAccountIdInvalidException()
         {
+
         }
 
         public BankAccountIdInvalidException(string message)
             : base(message)
         {
+
         }
 
         public BankAccountIdInvalidException(string message, Exception inner)
             : base(message, inner)
         {
+
         }
     }
 }

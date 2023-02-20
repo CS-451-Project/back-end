@@ -5,7 +5,10 @@ using GivingCircle.Api.DataAccess.Client;
 using GivingCircle.Api.Fundraiser.DataAccess;
 using GivingCircle.Api.Fundraiser.DataAccess.Repositories;
 using GivingCircle.Api.Fundraiser.Models;
+using GivingCircle.Api.Fundraiser.Models.Models;
+using GivingCircle.Api.Requests.FundraiserService;
 using GivingCircle.Api.Validation;
+using GivingCircle.Api.Validation.FundraiserService;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -45,6 +48,7 @@ var builder = WebApplication.CreateBuilder(args);
 
     // Register validators
     services.AddSingleton<IValidator<Fundraiser>, FundraiserValidator>();
+    services.AddSingleton<IValidator<AddBankAccountRequest>, AddBankAccountRequestValidator>();
 }
 
 var app = builder.Build();
