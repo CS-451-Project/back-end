@@ -1,5 +1,4 @@
 ﻿using GivingCircle.Api.Fundraiser.DataAccess;
-using GivingCircle.Api.Fundraiser.DataAccess.Exceptions;
 using GivingCircle.Api.Fundraiser.DataAccess.Responses;
 using GivingCircle.Api.Requests;
 using Microsoft.AspNetCore.Mvc;

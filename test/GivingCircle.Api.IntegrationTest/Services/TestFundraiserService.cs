@@ -27,8 +27,8 @@ namespace GivingCircle.Api.IntegrationTest.Services
             {
                 OrganizerId = "489DA2DA-6885-4099-A241-01111CDBFEB3",
                 BankInformationId = "f336eb4d-ace0-4f4b-9c90-ac3c16096acf",
-                Description = "test fundraiser description",
-                Title = "Test fundraiser",
+                Description = "test fundraiserSerialized description",
+                Title = "Test fundraiserSerialized",
                 PlannedEndDate = DateTime.Now.AddMonths(2).ToString(),
                 GoalTargetAmount = 200.00,
                 Tags = new string[] { "test1", "test2" }
@@ -39,41 +39,61 @@ namespace GivingCircle.Api.IntegrationTest.Services
 
             // When
 
-            // Create a fundraiser
+            // Create fundraiser
             var response = await httpClient.PostAsJsonAsync(url, createFundraiserRequest);
 
             // Then
             response.EnsureSuccessStatusCode(); // Status Code 200-299
 
-            // And retrieve the fundraiser and soft delete
+            // And when
+
             FilterFundraisersRequest filterFundraisersRequest = new()
             {
-                Title = "Test fundraiser",
+                Title = "Test fundraiserSerialized",
                 Tags = new string[] { "test1", "blah" },
                 CreatedDateOffset = 1.0
             };
 
-            // Try to search for the fundraiser we just created
+            // Try to search for the fundraiserSerialized we just created
             response = await httpClient.PostAsJsonAsync(url + "/filter", filterFundraisersRequest);
 
-            var fundraiserToDelete = await response.Content.ReadAsStringAsync();
+            var fundraiserSerialized = await response.Content.ReadAsStringAsync();
 
             // deserilize the response
-            IEnumerable<GetFundraiserResponse> getFundraiserResponse = JsonConvert.DeserializeObject<IEnumerable<GetFundraiserResponse>>(fundraiserToDelete);
+            IEnumerable<GetFundraiserResponse> getFundraiserResponse = JsonConvert.DeserializeObject<IEnumerable<GetFundraiserResponse>>(fundraiserSerialized);
 
-            // get fundraiser we just created to try and delete
-            var fundraiserIdToDelete = getFundraiserResponse.ElementAt(0).FundraiserId;
+            // get fundraiserSerialized we just created to try and delete
+            var fundraiserId = getFundraiserResponse.ElementAt(0).FundraiserId;
 
-            // Soft Delete the created fundraiser
-            response = await httpClient.DeleteAsync(url + $"/{fundraiserIdToDelete}");
+            // And when
+
+            // Update the fundraiser
+            UpdateFundraiserRequest updateFundraiserRequest = new() {
+                FundraiserId = fundraiserId,
+                Description = "",
+                Title = "",
+                PlannedEndDate = "08/04/2023",
+                GoalTargetAmount = 1000.00,
+                Tags = new string[] { "testtesttest", }
+            };
+
+            response = await httpClient.PutAsJsonAsync(url, updateFundraiserRequest);
+
+            // Then
+            response.EnsureSuccessStatusCode();
+
+            // And when
+
+            // Soft Delete the created fundraiserSerialized
+            response = await httpClient.DeleteAsync(url + $"/{fundraiserId}");
 
             // Then
             response.EnsureSuccessStatusCode(); // Status Code 200-299
 
-            // And hard delete the fundraiser
+            // And when
 
-            // Hard Delete the created fundraiser
-            response = await httpClient.DeleteAsync(url + $"/delete/{fundraiserIdToDelete}");
+            // Hard Delete the created fundraiserSerialized
+            response = await httpClient.DeleteAsync(url + $"/delete/{fundraiserId}");
 
             // Then
             response.EnsureSuccessStatusCode(); // Status Code 200-299

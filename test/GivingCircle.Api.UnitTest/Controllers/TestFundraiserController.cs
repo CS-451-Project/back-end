@@ -17,7 +17,34 @@ namespace GivingCircle.Api.UnitTest.Controllers
         [Fact]
         public async void TestUpdateFundraiserHappyPath()
         {
+            // Given
+            var updateFundraiserRequest = new UpdateFundraiserRequest
+            {
+                FundraiserId = Guid.NewGuid().ToString(),
+                Description = "test fundraiser description",
+                Title = "Test fundraiser",
+                PlannedEndDate = "12/12/2024",
+                GoalTargetAmount = 200.00,
+                Tags = new string[] { "environment", "disaster" }
+            };
 
+            var fundraiserRepositoryMock = new Mock<IFundraiserRepository>();
+            fundraiserRepositoryMock
+                .Setup(x => x.UpdateFundraiserAsync(updateFundraiserRequest.FundraiserId, It.IsAny<Fundraiser.Models.Fundraiser>()))
+                .ReturnsAsync(true);
+
+            var loggerMock = new Mock<ILogger<FundraiserController>>();
+
+            var controllerMock = new FundraiserController(
+                loggerMock.Object,
+                fundraiserRepositoryMock.Object
+                );
+
+            // When
+            var result = await controllerMock.UpdateFundraiser(updateFundraiserRequest) as StatusCodeResult;
+
+            // Then
+            Assert.Equal(StatusCodes.Status200OK, result.StatusCode);
         }
 
         [Fact]
