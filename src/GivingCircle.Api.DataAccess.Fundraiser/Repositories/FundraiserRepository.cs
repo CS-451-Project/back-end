@@ -222,6 +222,26 @@ namespace GivingCircle.Api.Fundraiser.DataAccess
             return (deletedResult == 1);
         }
 
+        public async Task<bool> HardDeleteUserFundraiserAsync(string fundraiserId)
+        {
+            // The query string builder
+            StringBuilder queryBuilder = new();
+
+            // The dynamic parameters to be supplied to the query
+            DynamicParameters parameters = new();
+
+            parameters.Add("@FundraiserId", fundraiserId);
+
+            var query = queryBuilder
+                .Append($"DELETE FROM {_tableName} ")
+                .Append("WHERE fundraiser_id=@FundraiserId")
+                .ToString();
+
+            await _postgresClient.ExecuteAsync(query, parameters);
+
+            return true;
+        }
+
         public Task<bool> UpdateFundraiserAsync(Models.Fundraiser fundraiser)
         {
             throw new NotImplementedException();

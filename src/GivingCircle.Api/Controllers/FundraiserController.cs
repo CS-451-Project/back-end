@@ -238,5 +238,47 @@ namespace GivingCircle.Api.Controllers
                 return StatusCode(500, "Something went wrong");
             }
         }
+
+        /// <summary>
+        /// Deletes a single fundraiser. This is a hard delete to delete fundraisers for good either for testing
+        /// purposes, or because a user requests it.
+        /// </summary>
+        /// <param name="fundraiserId">The fundraiser's id</param>
+        /// <returns>Status 200 if success, error codes if failure</returns>
+        [HttpDelete("delete/{fundraiserId}")]
+        public async Task<IActionResult> HardDeleteUserFundraiser(string fundraiserId)
+        {
+            // The deleted result. True if success, false if errors
+            bool deletedFundraiserResult;
+
+            try
+            {
+                // Validate the given id
+                Guid.Parse(fundraiserId);
+
+                deletedFundraiserResult = await _fundraiserRepository.HardDeleteUserFundraiserAsync(fundraiserId);
+            }
+            catch (System.FormatException err)
+            {
+                _logger.LogError("Error deleting fundraiser", err);
+                return BadRequest("Invalid id");
+            }
+            catch (Exception err)
+            {
+                _logger.LogError("Error deleting fundraiser", err);
+                return StatusCode(500, "Something went wrong");
+            }
+
+            if (deletedFundraiserResult)
+            {
+                _logger.LogInformation("Successfully deleted {fundraiserId}", fundraiserId);
+                return Ok();
+            }
+            else
+            {
+                _logger.LogInformation("Unable to delete {fundraiserId}", fundraiserId);
+                return StatusCode(500, "Something went wrong");
+            }
+        }
     }
 }

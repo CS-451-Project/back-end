@@ -45,7 +45,14 @@ namespace GivingCircle.Api.Fundraiser.DataAccess
         /// it is terminated.
         /// </summary>
         /// <param name="fundraiserId">The fundraiser's id</param>
-        /// <returns>True if success, false or an error if not</returns>
+        /// <returns>True if success, else false or an error</returns>
         Task<bool> DeleteFundraiserAsync(string fundraiserId);
+
+        /// <summary>
+        /// Permanently deletes a fundraiser
+        /// </summary>
+        /// <param name="fundraiserId">The fundraiser's id</param>
+        /// <returns>True if success, else false if an error</returns>
+        Task<bool> HardDeleteUserFundraiserAsync(string fundraiserId);
     }
 }
