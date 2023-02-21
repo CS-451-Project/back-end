@@ -7,10 +7,13 @@ namespace GivingCircle.Api.Validation.FundraiserService
     {
         public AddBankAccountRequestValidator()
         {
-            RuleFor(x => x.Account_Name).Length(36);
-            RuleFor(x => x.Account_Num).Length(36);
-            RuleFor(x => x.Routing_Num).MinimumLength(1);
-            //RuleFor(x => x.Account_Name).GreaterThan(0.0);
+            RuleFor(x => x.Account_Name).MinimumLength(1);
+            RuleFor(x => x.Address).MinimumLength(1);
+            RuleFor(x => x.City).MinimumLength(1);
+            RuleFor(x => x.State).MinimumLength(1);
+            RuleFor(x => x.Zipcode).MinimumLength(5);
+            RuleFor(x => x.Account_Num).Length(12);
+            RuleFor(x => x.Routing_Num).MinimumLength(9);
         }
     }
 }

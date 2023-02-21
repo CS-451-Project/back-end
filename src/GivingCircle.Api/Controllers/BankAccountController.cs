@@ -65,9 +65,21 @@ namespace GivingCircle.Api.Controllers
         [HttpGet("{bankAccountId}")]
         public async Task<IActionResult> GetAccount(string bankAccountId)
         {
-            _logger.LogInformation("Received GET request");
 
-            var result = await _bankAccountRepository.GetBankAccount(bankAccountId);
+            BankAccount result;
+
+            _logger.LogInformation("Received GET request");
+            try
+            {
+                result = await _bankAccountRepository.GetBankAccount(bankAccountId);
+            }
+            catch (Exception err)
+            {
+                _logger.LogError(err.Message);
+                return StatusCode(500, err.Message);
+            }
+
+                
 
             return Ok(result);
 
@@ -78,10 +90,19 @@ namespace GivingCircle.Api.Controllers
         {
             _logger.LogInformation("Received DELETE request");
 
-            var result = await _bankAccountRepository.DeleteBankAccountAsync(bankAccountId);
+            bool result;
+
+            try
+            {
+                result = await _bankAccountRepository.DeleteBankAccountAsync(bankAccountId);
+            }
+            catch (Exception err)
+            {
+                _logger.LogError(err.Message);
+                return StatusCode(500, err.Message);
+            }
 
             return result ? StatusCode(204) : StatusCode(500);
         }
-
     }
 }

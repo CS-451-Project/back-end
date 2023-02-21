@@ -28,7 +28,7 @@ namespace GivingCircle.Api.DataAccess.Fundraisers.Repositories
             // Object to map the parameters to the query
             object parameters = new { Bank_Account_Id = bankAccountId };
 
-            var bankAccount = await _postgresClient.QuerySingleAsync<BankAccount>("SELECT * FROM bank_account WHERE bank_account_id = @Bank_Account_Id", parameters);
+            var bankAccount = await _postgresClient.QuerySingleAsync<BankAccount>("SELECT * FROM bank_accounts WHERE bank_account_id = @Bank_Account_Id", parameters);
             
             return bankAccount;
         }
@@ -36,24 +36,18 @@ namespace GivingCircle.Api.DataAccess.Fundraisers.Repositories
         public async Task<bool> AddBankAccount(BankAccount bankAccount)
         {
             StringBuilder query = new StringBuilder();
-            int createBankAccountResult = 0;
 
             //creates the sql string
             query
-                .Append("INSERT INTO bank_account (account_name, address, city, state, zipcode, bank_name, account_num, routing_num, account_type, bank_account_id) ")
+                .Append("INSERT INTO bank_accounts (account_name, address, city, state, zipcode, bank_name, account_num, routing_num, account_type, bank_account_id) ")
                 .Append("VALUES (@Account_Name, @Address, @City, @State, @Zipcode, @Bank_Name, @Account_Num, @Routing_Num, @Account_Type, @Bank_Account_Id)").ToString();
 
             var querybuild = query.ToString();
 
-            try
-            {
-                // Execute the query on the database
-                createBankAccountResult = await _postgresClient.ExecuteAsync(querybuild, bankAccount);
-            }
-            catch (Npgsql.PostgresException err)
-            {
 
-            }
+            // Execute the query on the database
+            var createBankAccountResult = await _postgresClient.ExecuteAsync(querybuild, bankAccount);
+
 
             return createBankAccountResult == 1 ? true : false;
 
@@ -68,7 +62,7 @@ namespace GivingCircle.Api.DataAccess.Fundraisers.Repositories
 
             // Will return 1 if successful
             var deleteBankAccount = await _postgresClient.ExecuteAsync(query
-                .Append("DELETE FROM bank_account ")
+                .Append("DELETE FROM bank_accounts ")
                 .Append("WHERE bank_account_id = @Bank_Account_Id").ToString(),
                 parameters);
 
