@@ -1,8 +1,8 @@
-﻿using GivingCircle.Api.Fundraiser.DataAccess.Responses;
+﻿using GivingCircle.Api.DataAccess.Fundraisers.Responses;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace GivingCircle.Api.Fundraiser.DataAccess
+namespace GivingCircle.Api.DataAccess.Fundraisers.Repositories
 {
     public interface IFundraiserRepository
     {

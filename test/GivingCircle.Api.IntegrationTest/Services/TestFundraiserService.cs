@@ -4,10 +4,10 @@ using System.Threading.Tasks;
 using Xunit;
 using System.Net.Http.Json;
 using GivingCircle.Api.Requests;
-using GivingCircle.Api.Fundraiser.DataAccess.Responses;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
+using GivingCircle.Api.DataAccess.Fundraisers.Responses;
 
 namespace GivingCircle.Api.IntegrationTest.Services
 {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GivingCircle.Api.Fundraiser.Models
+namespace GivingCircle.Api.Models
 {
     public class Fundraiser
     {

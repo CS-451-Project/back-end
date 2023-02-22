@@ -1,6 +1,7 @@
 ﻿using GivingCircle.Api.Controllers;
-using GivingCircle.Api.Fundraiser.DataAccess;
-using GivingCircle.Api.Fundraiser.DataAccess.Responses;
+using GivingCircle.Api.DataAccess.Fundraisers.Repositories;
+using GivingCircle.Api.DataAccess.Fundraisers.Responses;
+using GivingCircle.Api.Models;
 using GivingCircle.Api.Requests;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -30,7 +31,7 @@ namespace GivingCircle.Api.UnitTest.Controllers
 
             var fundraiserRepositoryMock = new Mock<IFundraiserRepository>();
             fundraiserRepositoryMock
-                .Setup(x => x.UpdateFundraiserAsync(updateFundraiserRequest.FundraiserId, It.IsAny<Fundraiser.Models.Fundraiser>()))
+                .Setup(x => x.UpdateFundraiserAsync(updateFundraiserRequest.FundraiserId, It.IsAny<Fundraiser>()))
                 .ReturnsAsync(true);
 
             var loggerMock = new Mock<ILogger<FundraiserController>>();
@@ -230,7 +231,7 @@ namespace GivingCircle.Api.UnitTest.Controllers
             };
 
             var fundraiserRepositoryMock = new Mock<IFundraiserRepository>();
-            fundraiserRepositoryMock.Setup(r => r.CreateFundraiserAsync(It.IsAny<Fundraiser.Models.Fundraiser>()))
+            fundraiserRepositoryMock.Setup(r => r.CreateFundraiserAsync(It.IsAny<Fundraiser>()))
                 .ReturnsAsync(true);
 
             var loggerMock = new Mock<ILogger<FundraiserController>>();

@@ -2,9 +2,11 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using GivingCircle.Api.DataAccess;
 using GivingCircle.Api.DataAccess.Client;
-using GivingCircle.Api.Fundraiser.DataAccess;
+using GivingCircle.Api.DataAccess.Fundraisers.Repositories;
 using GivingCircle.Api.Requests;
+using GivingCircle.Api.Requests.FundraiserService;
 using GivingCircle.Api.Validation;
+using GivingCircle.Api.Validation.FundraiserService;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,11 +32,21 @@ var builder = WebApplication.CreateBuilder(args);
             }
             )));
 
+    // Register repositories
+    services.AddSingleton<IBankAccountRepository>(x => new BankAccountRepository(
+        new PostgresClient(
+            new PostgresClientConfiguration
+            {
+                ConnectionString = builder.Configuration.GetConnectionString("DbConnection")
+            }
+            )));
+
     // Register automatic fluent validation
     services.AddFluentValidationAutoValidation();
 
     // Register validators
     services.AddSingleton<IValidator<CreateFundraiserRequest>, CreateFundraiserRequestValidator>();
+    services.AddSingleton<IValidator<AddBankAccountRequest>, AddBankAccountRequestValidator>();
 }
 
 var app = builder.Build();

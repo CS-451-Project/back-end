@@ -1,13 +1,13 @@
 ﻿using Dapper;
 using GivingCircle.Api.DataAccess.Client;
-using GivingCircle.Api.Fundraiser.DataAccess.Responses;
+using GivingCircle.Api.DataAccess.Fundraisers.Responses;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GivingCircle.Api.Fundraiser.DataAccess
+namespace GivingCircle.Api.DataAccess.Fundraisers.Repositories
 {
     /// <inheritdoc />
     public class FundraiserRepository : IFundraiserRepository
@@ -288,5 +288,7 @@ namespace GivingCircle.Api.Fundraiser.DataAccess
 
             return true;
         }
+
+        
     }
 }
