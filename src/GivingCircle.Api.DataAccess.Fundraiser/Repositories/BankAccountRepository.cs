@@ -9,9 +9,6 @@ namespace GivingCircle.Api.DataAccess.Fundraisers.Repositories
     {
         private readonly PostgresClient _postgresClient;
 
-        private readonly string _tableName = "fundraisers";
-        private readonly string _banktable = "bank_account";
-
         /// <summary>
         /// Initializes an instance of the <see cref="BankAccountRepository"/> class
         /// </summary>

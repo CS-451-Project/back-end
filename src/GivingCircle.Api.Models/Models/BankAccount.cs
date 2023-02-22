@@ -19,10 +19,5 @@ namespace GivingCircle.Api.Models
         public string Routing_Num { get; set; }
         public string Account_Type { get; set; }
         public string Bank_Account_Id { get; set; }
-
-        public static implicit operator bool(BankAccount v)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

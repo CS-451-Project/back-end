@@ -55,7 +55,7 @@ namespace GivingCircle.Api.UnitTest.Controllers
             var Bank_Account_Id = Guid.NewGuid().ToString();
 
             var bankAccountRepositoryMock = new Mock<IBankAccountRepository>();
-            bankAccountRepositoryMock.Setup(r => r.DeleteBankAccountAsync(It.IsAny<string>()))
+            bankAccountRepositoryMock.Setup(r => r.DeleteBankAccountAsync(Bank_Account_Id))
                 .ReturnsAsync(true);
 
             var loggerMock = new Mock<ILogger<BankAccountController>>();
