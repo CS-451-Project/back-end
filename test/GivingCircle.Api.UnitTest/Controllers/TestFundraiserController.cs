@@ -1,6 +1,6 @@
 ﻿using GivingCircle.Api.Controllers;
-using GivingCircle.Api.DataAccess.Fundraisers.Repositories;
-using GivingCircle.Api.DataAccess.Fundraisers.Responses;
+using GivingCircle.Api.DataAccess.Repositories;
+using GivingCircle.Api.DataAccess.Responses;
 using GivingCircle.Api.Models;
 using GivingCircle.Api.Requests;
 using Microsoft.AspNetCore.Http;
@@ -15,6 +15,47 @@ namespace GivingCircle.Api.UnitTest.Controllers
 {
     public class TestFundraiserController
     {
+        [Fact]
+        public async void TestGetFundraiserHappyPath()
+        {
+            // Given
+            var userId = Guid.NewGuid().ToString();
+
+            var fundraiserId = Guid.NewGuid().ToString();
+
+            var fundraiser = new GetFundraiserResponse
+            {
+                FundraiserId = fundraiserId,
+                OrganizerId = userId,
+                PictureId = Guid.NewGuid().ToString(),
+                Title = "Test title 1",
+                Description = "test dscription 1",
+                CreatedDate = DateTime.Now,
+                PlannedEndDate = DateTime.Now.AddDays(90),
+                GoalTargetAmount = 9000.0,
+                CurrentBalanceAmount = 500.0,
+                Tags = new string[] { "environment", "test tag" }
+            };
+
+            var fundraiserRepositoryMock = new Mock<IFundraiserRepository>();
+            fundraiserRepositoryMock.Setup(r => r.GetFundraiserAsync(fundraiserId))
+                .ReturnsAsync(fundraiser);
+
+            var loggerMock = new Mock<ILogger<FundraiserController>>();
+
+            var controllerMock = new FundraiserController(
+                loggerMock.Object,
+                fundraiserRepositoryMock.Object
+                );
+
+            // When
+            var result = await controllerMock.GetFundraiser(fundraiserId) as OkObjectResult;
+
+            // Then
+            Assert.Equal(fundraiser, result.Value);
+            Assert.Equal(StatusCodes.Status200OK, result.StatusCode);
+        }
+
         [Fact]
         public async void TestUpdateFundraiserHappyPath()
         {
@@ -185,7 +226,7 @@ namespace GivingCircle.Api.UnitTest.Controllers
                 );
 
             // When
-            var result = await controllerMock.HardDeleteFundraiser(fundraiserId) as StatusCodeResult;
+            var result = await controllerMock.DeleteFundraiser(fundraiserId) as StatusCodeResult;
 
             // Then
             Assert.Equal(StatusCodes.Status200OK, result.StatusCode);
@@ -209,7 +250,7 @@ namespace GivingCircle.Api.UnitTest.Controllers
                 );
 
             // When
-            var result = await controllerMock.DeleteFundraiser(fundraiserId) as StatusCodeResult;
+            var result = await controllerMock.CloseFundraiser(fundraiserId) as StatusCodeResult;
 
             // Then
             Assert.Equal(StatusCodes.Status200OK, result.StatusCode);
@@ -242,10 +283,11 @@ namespace GivingCircle.Api.UnitTest.Controllers
                 );
 
             // When
-            var result = await controllerMock.CreateFundraiser(createFundraiserRequest) as StatusCodeResult;
+            var result = await controllerMock.CreateFundraiser(createFundraiserRequest) as CreatedResult;
 
             // Then
             Assert.Equal(StatusCodes.Status201Created, result.StatusCode);
+            Assert.Equal(typeof(string), result.Value.GetType());
         }
     }
 }

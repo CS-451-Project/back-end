@@ -4,10 +4,6 @@ using System.Threading.Tasks;
 using Xunit;
 using System.Net.Http.Json;
 using GivingCircle.Api.Requests;
-using Newtonsoft.Json;
-using System.Collections.Generic;
-using System.Linq;
-using GivingCircle.Api.DataAccess.Fundraisers.Responses;
 
 namespace GivingCircle.Api.IntegrationTest.Services
 {
@@ -17,7 +13,7 @@ namespace GivingCircle.Api.IntegrationTest.Services
         public async Task TestCreateSearchDeleteFundraiser()
         {
             // Given
-            string url = "https://localhost:7000/api/fundraisers";
+            string url = "https://localhost:7000/api";
 
             var application = new WebApplicationFactory<Program>();
 
@@ -37,15 +33,12 @@ namespace GivingCircle.Api.IntegrationTest.Services
             // Set the base address
             application.Server.BaseAddress = new Uri(url);
 
-            // When
+            // Create a fundraiser
+            var response = await httpClient.PostAsJsonAsync(url + "/fundraiser", createFundraiserRequest);
+            response.EnsureSuccessStatusCode();
 
-            // Create fundraiser
-            var response = await httpClient.PostAsJsonAsync(url, createFundraiserRequest);
-
-            // Then
-            response.EnsureSuccessStatusCode(); // Status Code 200-299
-
-            // And when
+            // Get its id
+            var fundraiserId = response.Content.ReadAsStringAsync().Result.ToString();
 
             FilterFundraisersRequest filterFundraisersRequest = new()
             {
@@ -54,20 +47,14 @@ namespace GivingCircle.Api.IntegrationTest.Services
                 CreatedDateOffset = 1.0
             };
 
-            // Try to search for the fundraiserSerialized we just created
-            response = await httpClient.PostAsJsonAsync(url + "/filter", filterFundraisersRequest);
+            // Try to search
+            response = await httpClient.PostAsJsonAsync(url + "/fundraiser/filter", filterFundraisersRequest);
+            response.EnsureSuccessStatusCode();
 
-            var fundraiserSerialized = await response.Content.ReadAsStringAsync();
+            // get fundraiser we just created to try and delete
+            response = await httpClient.GetAsync(url + $"/user/fundraiser/{fundraiserId}");
 
-            // deserilize the response
-            IEnumerable<GetFundraiserResponse> getFundraiserResponse = JsonConvert.DeserializeObject<IEnumerable<GetFundraiserResponse>>(fundraiserSerialized);
-
-            // get fundraiserSerialized we just created to try and delete
-            var fundraiserId = getFundraiserResponse.ElementAt(0).FundraiserId;
-
-            // And when
-
-            // Update the fundraiser
+            // Try to update the fundraiser
             UpdateFundraiserRequest updateFundraiserRequest = new() {
                 FundraiserId = fundraiserId,
                 Description = "",
@@ -77,26 +64,16 @@ namespace GivingCircle.Api.IntegrationTest.Services
                 Tags = new string[] { "testtesttest", }
             };
 
-            response = await httpClient.PutAsJsonAsync(url, updateFundraiserRequest);
-
-            // Then
+            response = await httpClient.PutAsJsonAsync(url + "/fundraiser", updateFundraiserRequest);
             response.EnsureSuccessStatusCode();
 
-            // And when
-
-            // Soft Delete the created fundraiserSerialized
-            response = await httpClient.DeleteAsync(url + $"/{fundraiserId}");
-
-            // Then
-            response.EnsureSuccessStatusCode(); // Status Code 200-299
-
-            // And when
+            // Soft Delete the created fundraiser
+            response = await httpClient.DeleteAsync(url + "/fundraiser" + $"/{fundraiserId}/close");
+            response.EnsureSuccessStatusCode();
 
             // Hard Delete the created fundraiserSerialized
-            response = await httpClient.DeleteAsync(url + $"/delete/{fundraiserId}");
-
-            // Then
-            response.EnsureSuccessStatusCode(); // Status Code 200-299
+            response = await httpClient.DeleteAsync(url + $"/fundraiser/{fundraiserId}");
+            response.EnsureSuccessStatusCode();
         }
     }
 }

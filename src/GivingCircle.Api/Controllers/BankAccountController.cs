@@ -1,4 +1,4 @@
-﻿using GivingCircle.Api.DataAccess.Fundraisers.Repositories;
+﻿using GivingCircle.Api.DataAccess.Repositories;
 using GivingCircle.Api.Models;
 using GivingCircle.Api.Requests.FundraiserService;
 using Microsoft.AspNetCore.Mvc;
