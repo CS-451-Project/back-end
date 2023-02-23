@@ -2,7 +2,7 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using GivingCircle.Api.DataAccess;
 using GivingCircle.Api.DataAccess.Client;
-using GivingCircle.Api.DataAccess.Fundraisers.Repositories;
+using GivingCircle.Api.DataAccess.Repositories;
 using GivingCircle.Api.Requests;
 using GivingCircle.Api.Requests.FundraiserService;
 using GivingCircle.Api.Validation;

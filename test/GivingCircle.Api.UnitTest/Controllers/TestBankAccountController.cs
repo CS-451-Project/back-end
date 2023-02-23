@@ -1,5 +1,5 @@
 ﻿using GivingCircle.Api.Controllers;
-using GivingCircle.Api.DataAccess.Fundraisers.Repositories;
+using GivingCircle.Api.DataAccess.Repositories;
 using GivingCircle.Api.Models;
 using GivingCircle.Api.Requests.FundraiserService;
 using Microsoft.AspNetCore.Http;

@@ -1,13 +1,13 @@
 ﻿using Dapper;
 using GivingCircle.Api.DataAccess.Client;
-using GivingCircle.Api.DataAccess.Fundraisers.Responses;
+using GivingCircle.Api.DataAccess.Responses;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GivingCircle.Api.DataAccess.Fundraisers.Repositories
+namespace GivingCircle.Api.DataAccess.Repositories
 {
     /// <inheritdoc />
     public class FundraiserRepository : IFundraiserRepository
@@ -25,9 +25,34 @@ namespace GivingCircle.Api.DataAccess.Fundraisers.Repositories
             _postgresClient = postgresClient;
         }
 
+        public async Task<GetFundraiserResponse> GetFundraiserAsync(string fundraiserId)
+        {
+            // The fundraiser to be returned
+            GetFundraiserResponse fundraiser;
+
+            // The query string builder
+            StringBuilder queryBuilder = new();
+
+            // The parameters to be given to the query
+            DynamicParameters parameters = new();
+
+            parameters.Add("@FundraiserId", fundraiserId);
+
+            // Construct the query
+            var query = queryBuilder
+                .Append($"SELECT * FROM {_tableName} ")
+                .Append("WHERE fundraiser_id=@FundraiserId ")
+                .Append("AND closed_date IS NULL")
+                .ToString();
+
+            fundraiser = await _postgresClient.QuerySingleAsync<GetFundraiserResponse>(query, parameters);
+
+            return fundraiser ?? null;
+        }
+
         public async Task<IEnumerable<GetFundraiserResponse>> FilterFundraisersAsync(Dictionary<string, string[]> filterProps)
         {
-            // The returned fundraisers
+            // The returned fundraiser
             IEnumerable<GetFundraiserResponse> fundraisers;
 
             // The query parameters
@@ -101,7 +126,7 @@ namespace GivingCircle.Api.DataAccess.Fundraisers.Repositories
 
                 parameters.Add("@CreatedDateOffset", DateTime.Parse(filterProps["CreatedDateOffset"].ElementAt(0)));
 
-                firstFilter= false;
+                firstFilter = false;
             }
 
             // Planned End Date offset filter
@@ -117,10 +142,10 @@ namespace GivingCircle.Api.DataAccess.Fundraisers.Repositories
 
                 parameters.Add("@EndDateOffset", DateTime.Parse(filterProps["EndDateOffset"].ElementAt(0)));
 
-                firstFilter= false;
+                firstFilter = false;
             }
 
-            // Check that the fundraisers aren't closed. Closed being "deleted" / hidden from the public eye.
+            // Check that the fundraiser aren't closed. Closed being "deleted" / hidden from the public eye.
             query += firstFilter ? "WHERE closed_date IS NULL " : "AND closed_date IS NULL ";
 
             // Order by whereOrAndClause ascending or descending
@@ -133,7 +158,7 @@ namespace GivingCircle.Api.DataAccess.Fundraisers.Repositories
 
                 query += $"ORDER BY {orderBy} {ascending}";
             }
-            // Logic for when we want to order by the fundraisers that are closest to their target goal
+            // Logic for when we want to order by the fundraiser that are closest to their target goal
             else if (filterProps.ContainsKey("OrderBy") && filterProps["OrderBy"].ElementAt(0) == "current_balance_amount")
             {
                 var ascending = filterProps["Ascending"].ElementAt(0);
@@ -154,14 +179,14 @@ namespace GivingCircle.Api.DataAccess.Fundraisers.Repositories
 
         public async Task<IEnumerable<GetFundraiserResponse>> ListFundraisersByUserIdAsync(string userId)
         {
-            // The fundraisers to be returned
+            // The fundraiser to be returned
             IEnumerable<GetFundraiserResponse> fundraisers;
 
             // The query string builder
             StringBuilder queryBuilder = new();
 
             // The parameters to be given to the query
-            DynamicParameters parameters = new ();
+            DynamicParameters parameters = new();
 
             parameters.Add("@UserId", userId);
 
@@ -171,7 +196,7 @@ namespace GivingCircle.Api.DataAccess.Fundraisers.Repositories
                 .Append("WHERE organizer_id=@UserId ")
                 .Append("AND closed_date IS NULL")
                 .ToString();
-            
+
             fundraisers = await _postgresClient.QueryAsync<GetFundraiserResponse>(query, parameters);
 
             return fundraisers ?? Enumerable.Empty<GetFundraiserResponse>();
@@ -213,7 +238,7 @@ namespace GivingCircle.Api.DataAccess.Fundraisers.Repositories
             {
                 { "@PictureId",  fundraiser.PictureId },
                 { "@Description",  fundraiser.Description },
-                { "@Title", fundraiser.Title}, 
+                { "@Title", fundraiser.Title},
                 { "@PlannedEndDate", fundraiser.PlannedEndDate },
                 { "@GoalTargetAmount", fundraiser.GoalTargetAmount },
                 { "@Tags", fundraiser.Tags },
@@ -288,7 +313,6 @@ namespace GivingCircle.Api.DataAccess.Fundraisers.Repositories
 
             return true;
         }
-
-        
     }
 }
+

@@ -24,8 +24,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GivingCircle.Api.Models", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GivingCircle.Api.DataAccess", "src\GivingCircle.Api.DataAccess\GivingCircle.Api.DataAccess.csproj", "{96576EFD-0F04-4CD4-9A11-81CB42BF52CB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GivingCircle.Api.DataAccess.Fundraisers", "src\GivingCircle.Api.DataAccess.Fundraiser\GivingCircle.Api.DataAccess.Fundraisers.csproj", "{F61B47D6-AE32-4600-874E-977DCD266E39}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -52,10 +50,6 @@ Global
 		{96576EFD-0F04-4CD4-9A11-81CB42BF52CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{96576EFD-0F04-4CD4-9A11-81CB42BF52CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{96576EFD-0F04-4CD4-9A11-81CB42BF52CB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F61B47D6-AE32-4600-874E-977DCD266E39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F61B47D6-AE32-4600-874E-977DCD266E39}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F61B47D6-AE32-4600-874E-977DCD266E39}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F61B47D6-AE32-4600-874E-977DCD266E39}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -66,7 +60,6 @@ Global
 		{7E847238-8AA4-4FC6-AE82-4CBC2F5884C3} = {C0A37AA7-4C78-4A33-9C8E-A2B95EF26DD6}
 		{02B15215-A228-417B-B81E-07E1FBF2A2AD} = {7A8DDC36-6FCC-4040-9922-C51202072E90}
 		{96576EFD-0F04-4CD4-9A11-81CB42BF52CB} = {7A8DDC36-6FCC-4040-9922-C51202072E90}
-		{F61B47D6-AE32-4600-874E-977DCD266E39} = {7A8DDC36-6FCC-4040-9922-C51202072E90}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9817AEE4-3F85-4707-89EA-FE6CC9A15EF0}

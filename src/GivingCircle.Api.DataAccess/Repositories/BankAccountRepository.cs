@@ -3,7 +3,7 @@ using GivingCircle.Api.Models;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GivingCircle.Api.DataAccess.Fundraisers.Repositories
+namespace GivingCircle.Api.DataAccess.Repositories
 {
     public class BankAccountRepository : IBankAccountRepository
     {
@@ -26,7 +26,7 @@ namespace GivingCircle.Api.DataAccess.Fundraisers.Repositories
             object parameters = new { Bank_Account_Id = bankAccountId };
 
             var bankAccount = await _postgresClient.QuerySingleAsync<BankAccount>("SELECT * FROM bank_accounts WHERE bank_account_id = @Bank_Account_Id", parameters);
-            
+
             return bankAccount;
         }
 

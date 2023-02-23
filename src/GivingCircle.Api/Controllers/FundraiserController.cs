@@ -1,5 +1,5 @@
-﻿using GivingCircle.Api.DataAccess.Fundraisers.Repositories;
-using GivingCircle.Api.DataAccess.Fundraisers.Responses;
+﻿using GivingCircle.Api.DataAccess.Repositories;
+using GivingCircle.Api.DataAccess.Responses;
 using GivingCircle.Api.Models;
 using GivingCircle.Api.Requests;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace GivingCircle.Api.Controllers
 {
     [ApiController]
-    [Route("api/fundraisers")]
+    [Route("api")]
     public class FundraiserController : ControllerBase
     {
         private readonly ILogger<FundraiserController> _logger;
@@ -28,11 +28,43 @@ namespace GivingCircle.Api.Controllers
         }
 
         /// <summary>
+        /// Gets a fundraiser by its id
+        /// </summary>
+        /// <param name="fundraiserId">The user id</param>
+        /// <returns>A list of fundraisers if they exist, an empty list otherwise</returns>
+        [HttpGet("fundraiser/{fundraiserId}")]
+        public async Task<IActionResult> GetFundraiser(string fundraiserId)
+        {
+            // The fundraisers to return
+            GetFundraiserResponse fundraiser;
+
+            try
+            {
+                // Validate the provided user id
+                Guid.Parse(fundraiserId);
+
+                fundraiser = await _fundraiserRepository.GetFundraiserAsync(fundraiserId);
+            }
+            catch (System.FormatException err)
+            {
+                _logger.LogError("Error getting fundraiser", err);
+                return BadRequest("Invalid id");
+            }
+            catch (Exception err)
+            {
+                _logger.LogError("Error getting fundraiser", err);
+                return StatusCode(500, "Something went wrong");
+            }
+
+            return Ok(fundraiser);
+        }
+
+        /// <summary>
         /// Lists the fundraisers tied to a user's id
         /// </summary>
         /// <param name="userId">The user id</param>
         /// <returns>A list of fundraisers if they exist, an empty list otherwise</returns>
-        [HttpGet("{userId}")]
+        [HttpGet("user/{userId}/fundraiser")]
         public async Task<IActionResult> ListFundraisersByUserId(string userId)
         {
             // The fundraisers to return
@@ -69,7 +101,7 @@ namespace GivingCircle.Api.Controllers
         /// </summary>
         /// <param name="filterPropsRequest">The filter properties</param>
         /// <returns>A list of sorted and filtered fundraisers</returns>
-        [HttpPost("filter")]
+        [HttpPost("fundraiser/filter")]
         public async Task<IActionResult> FilterFundraisers([FromBody] FilterFundraisersRequest filterPropsRequest)
         {
             // The valid order by columns. Used to map given val to table column name / order by method
@@ -143,16 +175,17 @@ namespace GivingCircle.Api.Controllers
         /// </summary>
         /// <param name="request">The create fundraiser request <see cref="CreateFundraiserRequest"/></param>
         /// <returns>Status(201) if successful, failure codes otherwise</returns>
-        [HttpPost]
+        [HttpPost("fundraiser")]
         public async Task<IActionResult> CreateFundraiser([FromBody] CreateFundraiserRequest request)
         {
             // True if successfully created, false if there was an issue
             bool createdFundraiserResult;
+            string fundraiserId;
 
             try
             {
                 // Generate fundraiser id
-                var fundraiserId = Guid.NewGuid().ToString();
+                fundraiserId = Guid.NewGuid().ToString();
 
                 // Generate todays date
                 var createdDate = DateTime.Now;
@@ -194,7 +227,7 @@ namespace GivingCircle.Api.Controllers
                 return StatusCode(500, "Something went wrong");
             }
 
-            return (createdFundraiserResult) ? StatusCode(201) : StatusCode(500, "Something went wrong");
+            return (createdFundraiserResult) ? Created("api/fundraiser", fundraiserId) : StatusCode(500, "Something went wrong");
         }
 
         /// <summary>
@@ -205,7 +238,7 @@ namespace GivingCircle.Api.Controllers
         /// </summary>
         /// <param name="request" <see cref="UpdateFundraiserRequest"/>>The update fundraiser request</param>
         /// <returns>Status(200) if successful, failure codes otherwise</returns>
-        [HttpPut]
+        [HttpPut("Fundraiser")]
         public async Task<IActionResult> UpdateFundraiser([FromBody] UpdateFundraiserRequest request)
         {
             // True if successfully updated, false if there was an issue
@@ -240,13 +273,13 @@ namespace GivingCircle.Api.Controllers
         }
 
         /// <summary>
-        /// Deletes a single fundraiser. Note that we do a "soft delete", and so the fundraiser isn't physically
+        /// Closes a single fundraiser. Note that we do a "soft delete", and so the fundraiser isn't physically
         /// deleted. We set the closed_date to a non null value to indicate deletion.
         /// </summary>
         /// <param name="fundraiserId">The fundraiser's id</param>
         /// <returns>Status 200 if success, error codes if failure</returns>
-        [HttpDelete("{fundraiserId}")]
-        public async Task<IActionResult> DeleteFundraiser(string fundraiserId)
+        [HttpDelete("fundraiser/{fundraiserId}/close")]
+        public async Task<IActionResult> CloseFundraiser(string fundraiserId)
         {
             // The deleted result. True if success, false if errors
             bool deletedFundraiserResult;
@@ -287,8 +320,8 @@ namespace GivingCircle.Api.Controllers
         /// </summary>
         /// <param name="fundraiserId">The fundraiser's id</param>
         /// <returns>Status 200 if success, error codes if failure</returns>
-        [HttpDelete("delete/{fundraiserId}")]
-        public async Task<IActionResult> HardDeleteFundraiser(string fundraiserId)
+        [HttpDelete("fundraiser/{fundraiserId}")]
+        public async Task<IActionResult> DeleteFundraiser(string fundraiserId)
         {
             // The deleted result. True if success, false if errors
             bool deletedFundraiserResult;

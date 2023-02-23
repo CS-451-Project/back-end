@@ -1,11 +1,18 @@
-﻿using GivingCircle.Api.DataAccess.Fundraisers.Responses;
+﻿using GivingCircle.Api.DataAccess.Responses;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace GivingCircle.Api.DataAccess.Fundraisers.Repositories
+namespace GivingCircle.Api.DataAccess.Repositories
 {
     public interface IFundraiserRepository
     {
+        /// <summary>
+        /// Gets a fundraiser by its id
+        /// </summary>
+        /// <param name="fundraiserId">The users id</param>
+        /// <returns>A list of fundraisers, if any</returns>
+        Task<GetFundraiserResponse> GetFundraiserAsync(string fundraiserId);
+
         /// <summary>
         /// Gets a list of fundraisers associated with a user's id
         /// </summary>
