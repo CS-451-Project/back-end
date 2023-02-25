@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -10,38 +9,28 @@ namespace GivingCircle.Api.Authorization
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     public class Authorize : Attribute, IAsyncAuthorizationFilter
     {
-        private readonly IEnumerable<string> _roles;
-
-        public Authorize(params string[] roles) 
-        {
-            _roles = roles ?? Enumerable.Empty<string>();
-        }
-
         public Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
-            // Construct the required identity roles
-            // From the http context grab the route user id and resource id
+            // Construct the required identity roles from the http context
+            // Grab the route user id and resource id
             var path = context.HttpContext.Request.Path.ToString();
-            Console.WriteLine(path);
             var pathItems = path.Split("/");
 
-            foreach ( var item in pathItems )
+            var requestedUserId = pathItems[3];
+            var requestedResourceId = pathItems[5];
+
+            // Grab the claims user id
+            var claimsUserId = context.HttpContext.User.Claims.FirstOrDefault(c => c.Type == "UserId").Value;
+
+            // Make sure that the claims user id matches the route user id
+            // If it doesn't then they are forbidden
+            if (claimsUserId != requestedUserId) 
             {
-                Console.WriteLine(item);
+                context.Result = new ForbidResult();
+                return Task.CompletedTask;
             }
-
-            var requestedUserId = path;
-
-            // Get the user's identity roles
-
-            foreach (var role in _roles)
-            {
-                Console.WriteLine(role);
-            }
-            // Make sure that they have each of the identity roles required
 
             // If they don't return forbidden, else authorize success
-            context.Result = new ForbidResult();
             return Task.CompletedTask;
         }
     }

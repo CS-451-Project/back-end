@@ -1,9 +1,7 @@
-﻿using GivingCircle.Api.Authorization;
-using GivingCircle.Api.Controllers;
+﻿using GivingCircle.Api.Controllers;
 using GivingCircle.Api.DataAccess.Repositories;
 using GivingCircle.Api.DataAccess.Responses;
 using GivingCircle.Api.Models;
-using GivingCircle.Api.Providers;
 using GivingCircle.Api.Requests;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -43,14 +41,11 @@ namespace GivingCircle.Api.UnitTest.Controllers
             fundraiserRepositoryMock.Setup(r => r.GetFundraiserAsync(fundraiserId))
                 .ReturnsAsync(fundraiser);
 
-            var identityRoleProviderMock = new Mock<IIdentityRoleProvider>();
-
             var loggerMock = new Mock<ILogger<FundraiserController>>();
 
             var controllerMock = new FundraiserController(
                 loggerMock.Object,
-                fundraiserRepositoryMock.Object,
-                identityRoleProviderMock.Object
+                fundraiserRepositoryMock.Object
                 );
 
             // When
@@ -82,14 +77,11 @@ namespace GivingCircle.Api.UnitTest.Controllers
                 .Setup(x => x.UpdateFundraiserAsync(fundraiserId, It.IsAny<Fundraiser>()))
                 .ReturnsAsync(true);
 
-            var identityRoleProviderMock = new Mock<IIdentityRoleProvider>();
-
             var loggerMock = new Mock<ILogger<FundraiserController>>();
 
             var controllerMock = new FundraiserController(
                 loggerMock.Object,
-                fundraiserRepositoryMock.Object,
-                identityRoleProviderMock.Object
+                fundraiserRepositoryMock.Object
                 );
 
             // When
@@ -148,14 +140,11 @@ namespace GivingCircle.Api.UnitTest.Controllers
                 .Setup(x => x.FilterFundraisersAsync(It.IsAny<Dictionary<string, string[]>>()))
                 .ReturnsAsync(fundraisers);
 
-            var identityRoleProviderMock = new Mock<IIdentityRoleProvider>();
-
             var loggerMock = new Mock<ILogger<FundraiserController>>();
 
             var controllerMock = new FundraiserController(
                 loggerMock.Object,
-                fundraiserRepositoryMock.Object,
-                identityRoleProviderMock.Object
+                fundraiserRepositoryMock.Object
                 );
 
             // When
@@ -206,14 +195,11 @@ namespace GivingCircle.Api.UnitTest.Controllers
             fundraiserRepositoryMock.Setup(r => r.ListFundraisersByUserIdAsync(userId))
                 .ReturnsAsync(fundraisers);
 
-            var identityRoleProviderMock = new Mock<IIdentityRoleProvider>();
-
             var loggerMock = new Mock<ILogger<FundraiserController>>();
 
             var controllerMock = new FundraiserController(
                 loggerMock.Object,
-                fundraiserRepositoryMock.Object,
-                identityRoleProviderMock.Object
+                fundraiserRepositoryMock.Object
                 );
 
             // When
@@ -230,22 +216,21 @@ namespace GivingCircle.Api.UnitTest.Controllers
             // Given
             var fundraiserId = Guid.NewGuid().ToString();
 
+            var userId = Guid.NewGuid().ToString();
+
             var fundraiserRepositoryMock = new Mock<IFundraiserRepository>();
             fundraiserRepositoryMock.Setup(r => r.HardDeleteFundraiserAsync(It.IsAny<string>()))
                 .ReturnsAsync(true);
-
-            var identityRoleProviderMock = new Mock<IIdentityRoleProvider>();
 
             var loggerMock = new Mock<ILogger<FundraiserController>>();
 
             var controllerMock = new FundraiserController(
                 loggerMock.Object,
-                fundraiserRepositoryMock.Object,
-                identityRoleProviderMock.Object
+                fundraiserRepositoryMock.Object
                 );
 
             // When
-            var result = await controllerMock.DeleteFundraiser(fundraiserId) as StatusCodeResult;
+            var result = await controllerMock.DeleteFundraiser(userId, fundraiserId) as StatusCodeResult;
 
             // Then
             Assert.Equal(StatusCodes.Status200OK, result.StatusCode);
@@ -261,14 +246,11 @@ namespace GivingCircle.Api.UnitTest.Controllers
             fundraiserRepositoryMock.Setup(r => r.DeleteFundraiserAsync(It.IsAny<string>()))
                 .ReturnsAsync(true);
 
-            var identityRoleProviderMock = new Mock<IIdentityRoleProvider>();
-
             var loggerMock = new Mock<ILogger<FundraiserController>>();
 
             var controllerMock = new FundraiserController(
                 loggerMock.Object,
-                fundraiserRepositoryMock.Object,
-                identityRoleProviderMock.Object
+                fundraiserRepositoryMock.Object
                 );
 
             // When
@@ -298,17 +280,11 @@ namespace GivingCircle.Api.UnitTest.Controllers
             fundraiserRepositoryMock.Setup(r => r.CreateFundraiserAsync(It.IsAny<Fundraiser>()))
                 .ReturnsAsync(true);
 
-            var identityRoleProviderMock = new Mock<IIdentityRoleProvider>();
-            identityRoleProviderMock
-                .Setup(r => r.AddIdentityRole(userId, It.IsAny<string>(), OwnerRole.name))
-                .ReturnsAsync(true);
-
             var loggerMock = new Mock<ILogger<FundraiserController>>();
 
             var controllerMock = new FundraiserController(
                 loggerMock.Object,
-                fundraiserRepositoryMock.Object,
-                identityRoleProviderMock.Object
+                fundraiserRepositoryMock.Object
                 );
 
             // When

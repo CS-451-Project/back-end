@@ -12,8 +12,6 @@ namespace GivingCircle.Api.Authorization
 {
     public class BasicAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
     {
-        // Going to need a user repository
-
         public BasicAuthenticationHandler(
             IOptionsMonitor<AuthenticationSchemeOptions> options,
             ILoggerFactory logger,
@@ -58,7 +56,7 @@ namespace GivingCircle.Api.Authorization
             // Check if this user exists
             // var user = await _userRepository.GetUserByUsernameAsync(givenUsername);
 
-            string userId = Guid.NewGuid().ToString();
+            string userId = "489DA2DA-6885-4099-A241-01111CDBFEB3";
 
             //if (givenUsername != user.Username || givenPassword != user.Password)
             //{
@@ -66,7 +64,7 @@ namespace GivingCircle.Api.Authorization
             //}
 
             // Generate ticket
-            var claim = new[] { new Claim(ClaimTypes.Name, userId) };
+            var claim = new[] { new Claim("UserId", userId) };
             var identity = new ClaimsIdentity(claim, Scheme.Name);
             var principal = new ClaimsPrincipal(identity);
             var ticket = new AuthenticationTicket(principal, Scheme.Name);

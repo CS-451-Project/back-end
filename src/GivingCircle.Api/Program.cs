@@ -4,7 +4,6 @@ using GivingCircle.Api.Authorization;
 using GivingCircle.Api.DataAccess;
 using GivingCircle.Api.DataAccess.Client;
 using GivingCircle.Api.DataAccess.Repositories;
-using GivingCircle.Api.Providers;
 using GivingCircle.Api.Requests;
 using GivingCircle.Api.Requests.FundraiserService;
 using GivingCircle.Api.Validation;
@@ -37,10 +36,6 @@ var builder = WebApplication.CreateBuilder(args);
     });
     services.AddSingleton<IFundraiserRepository>(x => new FundraiserRepository(postgresClient));
     services.AddSingleton<IBankAccountRepository>(x => new BankAccountRepository(postgresClient));
-    services.AddSingleton<IIdentityRoleRepository>(x => new IdentityRoleRepository(postgresClient));
-
-    // Register providers
-    services.AddSingleton<IIdentityRoleProvider, IdentityRoleProvider>();
 
     // Register automatic fluent validation
     services.AddFluentValidationAutoValidation();

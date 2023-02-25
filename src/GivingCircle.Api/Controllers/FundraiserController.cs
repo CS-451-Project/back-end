@@ -2,7 +2,6 @@
 using GivingCircle.Api.DataAccess.Repositories;
 using GivingCircle.Api.DataAccess.Responses;
 using GivingCircle.Api.Models;
-using GivingCircle.Api.Providers;
 using GivingCircle.Api.Requests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -22,16 +21,12 @@ namespace GivingCircle.Api.Controllers
 
         private readonly IFundraiserRepository _fundraiserRepository;
 
-        private readonly IIdentityRoleProvider _identityRoleProvider;
-
         public FundraiserController(
             ILogger<FundraiserController> logger,
-            IFundraiserRepository fundraiserRepository,
-            IIdentityRoleProvider identityRoleProvider)
+            IFundraiserRepository fundraiserRepository)
         {
             _logger = logger;
             _fundraiserRepository = fundraiserRepository;
-            _identityRoleProvider= identityRoleProvider;
         }
 
         /// <summary>
@@ -111,7 +106,7 @@ namespace GivingCircle.Api.Controllers
         /// <param name="filterPropsRequest">The filter properties</param>
         /// <returns>A list of sorted and filtered fundraisers</returns>
         [AllowAnonymous]
-        [HttpPost("fundraiser/filter")]
+        [HttpPost("fundraiser")]
         public async Task<IActionResult> FilterFundraisers([FromBody] FilterFundraisersRequest filterPropsRequest)
         {
             // The valid order by columns. Used to map given val to table column name / order by method
@@ -185,6 +180,7 @@ namespace GivingCircle.Api.Controllers
         /// </summary>
         /// <param name="request">The create fundraiser request <see cref="CreateFundraiserRequest"/></param>
         /// <returns>Status(201) if successful, failure codes otherwise</returns>
+        [TypeFilter(typeof(Authorize))]
         [HttpPost("user/{userId}/fundraiser")]
         public async Task<IActionResult> CreateFundraiser(string userId, [FromBody] CreateFundraiserRequest request)
         {
@@ -230,7 +226,6 @@ namespace GivingCircle.Api.Controllers
                 };
 
                 result = await _fundraiserRepository.CreateFundraiserAsync(fundraiser);
-                result = await _identityRoleProvider.AddIdentityRole(userId, fundraiserId, OwnerRole.name);
             }
             catch (Exception err)
             {
@@ -238,7 +233,7 @@ namespace GivingCircle.Api.Controllers
                 return StatusCode(500, "Something went wrong");
             }
 
-            return (result) ? Created("api/fundraiser", fundraiserId) : StatusCode(500, "Something went wrong");
+            return (result) ? Created("user/{userId}/fundraiser", fundraiserId) : StatusCode(500, "Something went wrong");
         }
 
         /// <summary>
@@ -249,7 +244,7 @@ namespace GivingCircle.Api.Controllers
         /// </summary>
         /// <param name="request" <see cref="UpdateFundraiserRequest"/>>The update fundraiser request</param>
         /// <returns>Status(200) if successful, failure codes otherwise</returns>
-        [@Authorize(new[] {OwnerRole.name})]
+        [TypeFilter(typeof(Authorize))]
         [HttpPut("user/{userId}/fundraiser/{fundraiserId}")]
         public async Task<IActionResult> UpdateFundraiser(string userId, string fundraiserId, [FromBody] UpdateFundraiserRequest request)
         {
@@ -290,7 +285,8 @@ namespace GivingCircle.Api.Controllers
         /// </summary>
         /// <param name="fundraiserId">The fundraiser's id</param>
         /// <returns>Status 200 if success, error codes if failure</returns>
-        [HttpDelete("fundraiser/{fundraiserId}/close")]
+        [TypeFilter(typeof(Authorize))]
+        [HttpDelete("user/fundraiser/{fundraiserId}/close")]
         public async Task<IActionResult> CloseFundraiser(string fundraiserId)
         {
             // The deleted result. True if success, false if errors
@@ -332,18 +328,19 @@ namespace GivingCircle.Api.Controllers
         /// </summary>
         /// <param name="fundraiserId">The fundraiser's id</param>
         /// <returns>Status 200 if success, error codes if failure</returns>
-        [HttpDelete("fundraiser/{fundraiserId}")]
-        public async Task<IActionResult> DeleteFundraiser(string fundraiserId)
+        [TypeFilter(typeof(Authorize))]
+        [HttpDelete("user/{userId}/fundraiser/{fundraiserId}")]
+        public async Task<IActionResult> DeleteFundraiser(string userId, string fundraiserId)
         {
             // The deleted result. True if success, false if errors
-            bool deletedFundraiserResult;
+            bool result;
 
             try
             {
                 // Validate the given id
                 Guid.Parse(fundraiserId);
 
-                deletedFundraiserResult = await _fundraiserRepository.HardDeleteFundraiserAsync(fundraiserId);
+                result = await _fundraiserRepository.HardDeleteFundraiserAsync(fundraiserId);
             }
             catch (System.FormatException err)
             {
@@ -356,7 +353,7 @@ namespace GivingCircle.Api.Controllers
                 return StatusCode(500, "Something went wrong");
             }
 
-            if (deletedFundraiserResult)
+            if (result)
             {
                 _logger.LogInformation("Successfully deleted {fundraiserId}", fundraiserId);
                 return Ok();
