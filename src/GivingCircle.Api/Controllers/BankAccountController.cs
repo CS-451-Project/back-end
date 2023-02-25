@@ -12,7 +12,7 @@ namespace GivingCircle.Api.Controllers
 {
     [AuthorizeAttribute]
     [ApiController]
-    [Route("api/fundraisers")]
+    [Route("api")]
     public class BankAccountController : ControllerBase
     {
         private readonly ILogger<BankAccountController> _logger;
