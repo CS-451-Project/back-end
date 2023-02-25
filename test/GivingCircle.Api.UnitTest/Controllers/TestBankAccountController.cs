@@ -9,7 +9,7 @@ using Moq;
 using System;
 using Xunit;
 
-namespace GivingCircle.Api.UnitTest.Controllers
+namespace GivingCircle.Api.UnitTest.ControllersKC
 {
     public class TestBankAccountController
     {
@@ -17,6 +17,8 @@ namespace GivingCircle.Api.UnitTest.Controllers
         public async void TestAddBankAccountAsync()
         {
             // Given
+            var userId = Guid.NewGuid().ToString();
+
             var addBankAccountRequest = new AddBankAccountRequest
             {
                 Account_Name = "Austin Nguyen",
@@ -38,11 +40,10 @@ namespace GivingCircle.Api.UnitTest.Controllers
 
             var controllerMock = new BankAccountController(
                 loggerMock.Object,
-                bankAccountRepositoryMock.Object
-                );
+                bankAccountRepositoryMock.Object);
 
             // When
-            var result = await controllerMock.AddBankAccount(addBankAccountRequest) as StatusCodeResult;
+            var result = await controllerMock.AddBankAccount(userId, addBankAccountRequest) as CreatedResult;
 
             // Then
             Assert.Equal(StatusCodes.Status201Created, result.StatusCode);
@@ -53,6 +54,7 @@ namespace GivingCircle.Api.UnitTest.Controllers
         {
             // Given
             var Bank_Account_Id = Guid.NewGuid().ToString();
+            var userId = Guid.NewGuid().ToString();
 
             var bankAccountRepositoryMock = new Mock<IBankAccountRepository>();
             bankAccountRepositoryMock.Setup(r => r.DeleteBankAccountAsync(Bank_Account_Id))
@@ -62,11 +64,10 @@ namespace GivingCircle.Api.UnitTest.Controllers
 
             var controllerMock = new BankAccountController(
                 loggerMock.Object,
-                bankAccountRepositoryMock.Object
-                );
+                bankAccountRepositoryMock.Object);
 
             // When
-            var result = await controllerMock.DeleteBankAccount(Bank_Account_Id) as StatusCodeResult;
+            var result = await controllerMock.DeleteBankAccount(userId, Bank_Account_Id) as StatusCodeResult;
 
             // Then
             Assert.Equal(StatusCodes.Status204NoContent, result.StatusCode);
@@ -77,6 +78,7 @@ namespace GivingCircle.Api.UnitTest.Controllers
         {
             // Given
             var bankAccountId = Guid.NewGuid().ToString();
+            var userId = Guid.NewGuid().ToString();
 
             var bankAccount = new BankAccount
             {
@@ -93,20 +95,18 @@ namespace GivingCircle.Api.UnitTest.Controllers
             };
 
             var bankAccountRepositoryMock = new Mock<IBankAccountRepository>();
-            bankAccountRepositoryMock.Setup(r => r.AddBankAccount(bankAccount))
-                .ReturnsAsync(true);
-            bankAccountRepositoryMock.Setup(r => r.GetBankAccount(bankAccountId))
+            bankAccountRepositoryMock
+                .Setup(r => r.GetBankAccount(bankAccountId))
                 .ReturnsAsync(bankAccount);
 
             var loggerMock = new Mock<ILogger<BankAccountController>>();
 
             var controllerMock = new BankAccountController(
                 loggerMock.Object,
-                bankAccountRepositoryMock.Object
-                );
+                bankAccountRepositoryMock.Object);
 
             // When
-            var result = await controllerMock.GetAccount(bankAccountId) as OkObjectResult;
+            var result = await controllerMock.GetAccount(userId, bankAccountId) as OkObjectResult;
 
             // Then
             Assert.Equal(bankAccount, result.Value);

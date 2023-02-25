@@ -1,13 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace GivingCircle.Api.Requests
+﻿namespace GivingCircle.Api.Requests
 {
     public class UpdateFundraiserRequest
     {
-        // The fundraiser's id
-        [Required]
-        public string FundraiserId { get; set; }
-
         // The fundraiser description
         public string Description { get; set; }
 

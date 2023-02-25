@@ -62,7 +62,6 @@ namespace GivingCircle.Api.UnitTest.Controllers
             // Given
             var updateFundraiserRequest = new UpdateFundraiserRequest
             {
-                FundraiserId = Guid.NewGuid().ToString(),
                 Description = "test fundraiser description",
                 Title = "Test fundraiser",
                 PlannedEndDate = "12/12/2024",
@@ -70,9 +69,12 @@ namespace GivingCircle.Api.UnitTest.Controllers
                 Tags = new string[] { "environment", "disaster" }
             };
 
+            var fundraiserId = Guid.NewGuid().ToString();
+            var userId = Guid.NewGuid().ToString();
+
             var fundraiserRepositoryMock = new Mock<IFundraiserRepository>();
             fundraiserRepositoryMock
-                .Setup(x => x.UpdateFundraiserAsync(updateFundraiserRequest.FundraiserId, It.IsAny<Fundraiser>()))
+                .Setup(x => x.UpdateFundraiserAsync(fundraiserId, It.IsAny<Fundraiser>()))
                 .ReturnsAsync(true);
 
             var loggerMock = new Mock<ILogger<FundraiserController>>();
@@ -83,7 +85,7 @@ namespace GivingCircle.Api.UnitTest.Controllers
                 );
 
             // When
-            var result = await controllerMock.UpdateFundraiser(updateFundraiserRequest) as StatusCodeResult;
+            var result = await controllerMock.UpdateFundraiser(userId, fundraiserId, updateFundraiserRequest) as StatusCodeResult;
 
             // Then
             Assert.Equal(StatusCodes.Status200OK, result.StatusCode);
@@ -214,6 +216,8 @@ namespace GivingCircle.Api.UnitTest.Controllers
             // Given
             var fundraiserId = Guid.NewGuid().ToString();
 
+            var userId = Guid.NewGuid().ToString();
+
             var fundraiserRepositoryMock = new Mock<IFundraiserRepository>();
             fundraiserRepositoryMock.Setup(r => r.HardDeleteFundraiserAsync(It.IsAny<string>()))
                 .ReturnsAsync(true);
@@ -226,7 +230,7 @@ namespace GivingCircle.Api.UnitTest.Controllers
                 );
 
             // When
-            var result = await controllerMock.DeleteFundraiser(fundraiserId) as StatusCodeResult;
+            var result = await controllerMock.DeleteFundraiser(userId, fundraiserId) as StatusCodeResult;
 
             // Then
             Assert.Equal(StatusCodes.Status200OK, result.StatusCode);
@@ -260,9 +264,10 @@ namespace GivingCircle.Api.UnitTest.Controllers
         public async void TestCreateFundraiserHappyPath()
         {
             // Given
+            var userId = Guid.NewGuid().ToString();
+
             var createFundraiserRequest = new CreateFundraiserRequest
             {
-                OrganizerId = "489DA2DA-6885-4099-A241-01111CDBFEB3",
                 BankInformationId = "f336eb4d-ace0-4f4b-9c90-ac3c16096acf",
                 Description = "test fundraiser description",
                 Title = "Test fundraiser",
@@ -283,7 +288,7 @@ namespace GivingCircle.Api.UnitTest.Controllers
                 );
 
             // When
-            var result = await controllerMock.CreateFundraiser(createFundraiserRequest) as CreatedResult;
+            var result = await controllerMock.CreateFundraiser(userId, createFundraiserRequest) as CreatedResult;
 
             // Then
             Assert.Equal(StatusCodes.Status201Created, result.StatusCode);

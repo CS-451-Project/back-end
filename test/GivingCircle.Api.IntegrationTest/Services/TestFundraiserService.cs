@@ -21,7 +21,6 @@ namespace GivingCircle.Api.IntegrationTest.Services
 
             var createFundraiserRequest = new CreateFundraiserRequest
             {
-                OrganizerId = "489DA2DA-6885-4099-A241-01111CDBFEB3",
                 BankInformationId = "f336eb4d-ace0-4f4b-9c90-ac3c16096acf",
                 Description = "test fundraiserSerialized description",
                 Title = "Test fundraiserSerialized",
@@ -55,8 +54,8 @@ namespace GivingCircle.Api.IntegrationTest.Services
             response = await httpClient.GetAsync(url + $"/user/fundraiser/{fundraiserId}");
 
             // Try to update the fundraiser
-            UpdateFundraiserRequest updateFundraiserRequest = new() {
-                FundraiserId = fundraiserId,
+            UpdateFundraiserRequest updateFundraiserRequest = new() 
+            {
                 Description = "",
                 Title = "",
                 PlannedEndDate = "08/04/2023",
