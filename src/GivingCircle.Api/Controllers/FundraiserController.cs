@@ -1,7 +1,10 @@
-﻿using GivingCircle.Api.DataAccess.Repositories;
+﻿using GivingCircle.Api.Authorization;
+using GivingCircle.Api.DataAccess.Repositories;
 using GivingCircle.Api.DataAccess.Responses;
 using GivingCircle.Api.Models;
+using GivingCircle.Api.Providers;
 using GivingCircle.Api.Requests;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -10,6 +13,7 @@ using System.Threading.Tasks;
 
 namespace GivingCircle.Api.Controllers
 {
+    [AuthorizeAttribute]
     [ApiController]
     [Route("api")]
     public class FundraiserController : ControllerBase
@@ -18,13 +22,16 @@ namespace GivingCircle.Api.Controllers
 
         private readonly IFundraiserRepository _fundraiserRepository;
 
+        private readonly IIdentityRoleProvider _identityRoleProvider;
+
         public FundraiserController(
             ILogger<FundraiserController> logger,
-            IFundraiserRepository fundraiserRepository)
+            IFundraiserRepository fundraiserRepository,
+            IIdentityRoleProvider identityRoleProvider)
         {
             _logger = logger;
             _fundraiserRepository = fundraiserRepository;
-
+            _identityRoleProvider= identityRoleProvider;
         }
 
         /// <summary>
@@ -32,6 +39,7 @@ namespace GivingCircle.Api.Controllers
         /// </summary>
         /// <param name="fundraiserId">The user id</param>
         /// <returns>A list of fundraisers if they exist, an empty list otherwise</returns>
+        [AllowAnonymous]
         [HttpGet("fundraiser/{fundraiserId}")]
         public async Task<IActionResult> GetFundraiser(string fundraiserId)
         {
@@ -64,6 +72,7 @@ namespace GivingCircle.Api.Controllers
         /// </summary>
         /// <param name="userId">The user id</param>
         /// <returns>A list of fundraisers if they exist, an empty list otherwise</returns>
+        [AllowAnonymous]
         [HttpGet("user/{userId}/fundraiser")]
         public async Task<IActionResult> ListFundraisersByUserId(string userId)
         {
@@ -101,6 +110,7 @@ namespace GivingCircle.Api.Controllers
         /// </summary>
         /// <param name="filterPropsRequest">The filter properties</param>
         /// <returns>A list of sorted and filtered fundraisers</returns>
+        [AllowAnonymous]
         [HttpPost("fundraiser/filter")]
         public async Task<IActionResult> FilterFundraisers([FromBody] FilterFundraisersRequest filterPropsRequest)
         {
@@ -117,7 +127,7 @@ namespace GivingCircle.Api.Controllers
             IEnumerable<GetFundraiserResponse> fundraisers;
 
             // The filter props to supply the repository with
-            Dictionary<string, string[]> dbFilterProps = new ();
+            Dictionary<string, string[]> dbFilterProps = new();
 
             try
             {
@@ -175,13 +185,13 @@ namespace GivingCircle.Api.Controllers
         /// </summary>
         /// <param name="request">The create fundraiser request <see cref="CreateFundraiserRequest"/></param>
         /// <returns>Status(201) if successful, failure codes otherwise</returns>
-        [HttpPost("fundraiser")]
-        public async Task<IActionResult> CreateFundraiser([FromBody] CreateFundraiserRequest request)
+        [HttpPost("user/{userId}/fundraiser")]
+        public async Task<IActionResult> CreateFundraiser(string userId, [FromBody] CreateFundraiserRequest request)
         {
             // True if successfully created, false if there was an issue
-            bool createdFundraiserResult;
+            bool result;
             string fundraiserId;
-
+            
             try
             {
                 // Generate fundraiser id
@@ -205,7 +215,7 @@ namespace GivingCircle.Api.Controllers
                 Fundraiser fundraiser = new()
                 {
                     FundraiserId = fundraiserId,
-                    OrganizerId = request.OrganizerId,
+                    OrganizerId = userId,
                     BankInformationId = request.BankInformationId,
                     PictureId = request.PictureId,
                     Description = description,
@@ -219,7 +229,8 @@ namespace GivingCircle.Api.Controllers
                     Tags = request.Tags
                 };
 
-                createdFundraiserResult = await _fundraiserRepository.CreateFundraiserAsync(fundraiser);
+                result = await _fundraiserRepository.CreateFundraiserAsync(fundraiser);
+                result = await _identityRoleProvider.AddIdentityRole(userId, fundraiserId, OwnerRole.name);
             }
             catch (Exception err)
             {
@@ -227,7 +238,7 @@ namespace GivingCircle.Api.Controllers
                 return StatusCode(500, "Something went wrong");
             }
 
-            return (createdFundraiserResult) ? Created("api/fundraiser", fundraiserId) : StatusCode(500, "Something went wrong");
+            return (result) ? Created("api/fundraiser", fundraiserId) : StatusCode(500, "Something went wrong");
         }
 
         /// <summary>
@@ -238,8 +249,9 @@ namespace GivingCircle.Api.Controllers
         /// </summary>
         /// <param name="request" <see cref="UpdateFundraiserRequest"/>>The update fundraiser request</param>
         /// <returns>Status(200) if successful, failure codes otherwise</returns>
-        [HttpPut("Fundraiser")]
-        public async Task<IActionResult> UpdateFundraiser([FromBody] UpdateFundraiserRequest request)
+        [@Authorize(new[] {OwnerRole.name})]
+        [HttpPut("user/{userId}/fundraiser/{fundraiserId}")]
+        public async Task<IActionResult> UpdateFundraiser(string userId, string fundraiserId, [FromBody] UpdateFundraiserRequest request)
         {
             // True if successfully updated, false if there was an issue
             bool updateFundraiserResult;
@@ -261,7 +273,7 @@ namespace GivingCircle.Api.Controllers
                     Tags = request.Tags
                 };
 
-                updateFundraiserResult = await _fundraiserRepository.UpdateFundraiserAsync(request.FundraiserId, fundraiser);
+                updateFundraiserResult = await _fundraiserRepository.UpdateFundraiserAsync(fundraiserId, fundraiser);
             }
             catch (Exception err)
             {

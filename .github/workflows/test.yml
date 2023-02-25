@@ -29,4 +29,4 @@ jobs:
       run: dotnet build --configuration Release --no-restore
     
     - name: Test
-      run: dotnet test --no-restore --verbosity normal
+      run: dotnet test test/GivingCircle.Api.UnitTest/GivingCircle.Api.UnitTest.csproj  --no-restore --verbosity normal

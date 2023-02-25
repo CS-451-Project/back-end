@@ -1,12 +1,15 @@
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using GivingCircle.Api.Authorization;
 using GivingCircle.Api.DataAccess;
 using GivingCircle.Api.DataAccess.Client;
 using GivingCircle.Api.DataAccess.Repositories;
+using GivingCircle.Api.Providers;
 using GivingCircle.Api.Requests;
 using GivingCircle.Api.Requests.FundraiserService;
 using GivingCircle.Api.Validation;
 using GivingCircle.Api.Validation.FundraiserService;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,23 +26,21 @@ var builder = WebApplication.CreateBuilder(args);
     // Add http context accessor access to classes
     services.AddHttpContextAccessor();
 
-    // Register repositories
-    services.AddSingleton<IFundraiserRepository>(x => new FundraiserRepository(
-        new PostgresClient(
-            new PostgresClientConfiguration
-            { 
-                ConnectionString = builder.Configuration.GetConnectionString("DbConnection")
-            }
-            )));
+    // Register authentication handler
+    services.AddAuthentication("BasicAuthentication")
+        .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", null);
 
     // Register repositories
-    services.AddSingleton<IBankAccountRepository>(x => new BankAccountRepository(
-        new PostgresClient(
-            new PostgresClientConfiguration
-            {
-                ConnectionString = builder.Configuration.GetConnectionString("DbConnection")
-            }
-            )));
+    var postgresClient = new PostgresClient(new PostgresClientConfiguration()
+    {
+        ConnectionString = builder.Configuration.GetConnectionString("DbConnection")
+    });
+    services.AddSingleton<IFundraiserRepository>(x => new FundraiserRepository(postgresClient));
+    services.AddSingleton<IBankAccountRepository>(x => new BankAccountRepository(postgresClient));
+    services.AddSingleton<IIdentityRoleRepository>(x => new IdentityRoleRepository(postgresClient));
+
+    // Register providers
+    services.AddSingleton<IIdentityRoleProvider, IdentityRoleProvider>();
 
     // Register automatic fluent validation
     services.AddFluentValidationAutoValidation();

@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using GivingCircle.Api.DataAccess.Client;
 using GivingCircle.Api.DataAccess.Responses;
+using GivingCircle.Api.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -202,7 +203,7 @@ namespace GivingCircle.Api.DataAccess.Repositories
             return fundraisers ?? Enumerable.Empty<GetFundraiserResponse>();
         }
 
-        public async Task<bool> CreateFundraiserAsync(Models.Fundraiser fundraiser)
+        public async Task<bool> CreateFundraiserAsync(Fundraiser fundraiser)
         {
             // The string builder
             StringBuilder queryBuilder = new();
@@ -225,7 +226,7 @@ namespace GivingCircle.Api.DataAccess.Repositories
             return (createdResult == 1);
         }
 
-        public async Task<bool> UpdateFundraiserAsync(string fundraiserId, Models.Fundraiser fundraiser)
+        public async Task<bool> UpdateFundraiserAsync(string fundraiserId, Fundraiser fundraiser)
         {
             // The string builder
             StringBuilder queryBuilder = new();
