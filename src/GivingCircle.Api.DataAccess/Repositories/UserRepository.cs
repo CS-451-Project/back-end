@@ -28,7 +28,7 @@ namespace GivingCircle.Api.DataAccess.Repositories
             // Object to map the parameters to the query
             object parameters = new { User_Id = userId };
 
-            var user = await _postgresClient.QuerySingleAsync<GetUserResponse>("SELECT * FROM users WHERE user_id = @User_Id", parameters);
+            var user = await _postgresClient.QuerySingleAsync<GetUserResponse>("SELECT * FROM users WHERE user_id = @User_Id ", parameters);
 
             return user ?? null;
         }
@@ -43,9 +43,9 @@ namespace GivingCircle.Api.DataAccess.Repositories
 
             // Construct the query
             var query = queryBuilder
-                .Append($"INSERT INTO users")
-                .Append("(user_id, first_name, middle_initial, last_name, password, email, created_date, planned_end_date)")
-                .Append("VALUES (@UserId, @FirstName, @MiddleInitial, @LastName, @Password, @email)")
+                .Append($"INSERT INTO users ")
+                .Append("(user_id, first_name, middle_initial, last_name, password, email, created_date, planned_end_date) ")
+                .Append("VALUES (@UserId, @FirstName, @MiddleInitial, @LastName, @Password, @email) ")
                 .ToString();
 
             createdResult = await _postgresClient.ExecuteAsync(query, user);
@@ -102,7 +102,7 @@ namespace GivingCircle.Api.DataAccess.Repositories
             // Will return 1 if successful
             var deleteUser = await _postgresClient.ExecuteAsync(query
                 .Append("DELETE FROM users ")
-                .Append("WHERE user_id = @User_Id").ToString(),
+                .Append("WHERE user_id = @User_Id ").ToString(),
                 parameters);
 
             return deleteUser == 1 ? true : false;
