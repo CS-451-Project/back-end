@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using Xunit;
 using System.Net.Http.Json;
 using GivingCircle.Api.Requests;
+using System.Net.Http.Headers;
+using System.Text;
 
 namespace GivingCircle.Api.IntegrationTest.Services
 {
@@ -15,6 +17,8 @@ namespace GivingCircle.Api.IntegrationTest.Services
             // Given
             string url = "https://localhost:7000/api";
 
+            string userId = "575B1943-CD13-4771-B698-DE4E1F4E22A7";
+
             var application = new WebApplicationFactory<Program>();
 
             var httpClient = application.CreateClient();
@@ -22,8 +26,8 @@ namespace GivingCircle.Api.IntegrationTest.Services
             var createFundraiserRequest = new CreateFundraiserRequest
             {
                 BankInformationId = "f336eb4d-ace0-4f4b-9c90-ac3c16096acf",
-                Description = "test fundraiserSerialized description",
-                Title = "Test fundraiserSerialized",
+                Description = "test fundraiser description",
+                Title = "Test fundraiser",
                 PlannedEndDate = DateTime.Now.AddMonths(2).ToString(),
                 GoalTargetAmount = 200.00,
                 Tags = new string[] { "test1", "test2" }
@@ -32,8 +36,14 @@ namespace GivingCircle.Api.IntegrationTest.Services
             // Set the base address
             application.Server.BaseAddress = new Uri(url);
 
+            // Create the authorization parameter
+            var parameter = Convert.ToBase64String(Encoding.UTF8.GetBytes("azdummy@gmail.com:test"));
+
+            // Set the authorization header
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("BasicAuthentication", parameter);
+
             // Create a fundraiser
-            var response = await httpClient.PostAsJsonAsync(url + "/fundraiser", createFundraiserRequest);
+            var response = await httpClient.PostAsJsonAsync(url + $"/user/{userId}/fundraiser", createFundraiserRequest);
             response.EnsureSuccessStatusCode();
 
             // Get its id
@@ -47,11 +57,12 @@ namespace GivingCircle.Api.IntegrationTest.Services
             };
 
             // Try to search
-            response = await httpClient.PostAsJsonAsync(url + "/fundraiser/filter", filterFundraisersRequest);
+            response = await httpClient.PostAsJsonAsync(url + "/fundraiser", filterFundraisersRequest);
             response.EnsureSuccessStatusCode();
 
             // get fundraiser we just created to try and delete
-            response = await httpClient.GetAsync(url + $"/user/fundraiser/{fundraiserId}");
+            response = await httpClient.GetAsync(url + $"/fundraiser/{fundraiserId}");
+            response.EnsureSuccessStatusCode();
 
             // Try to update the fundraiser
             UpdateFundraiserRequest updateFundraiserRequest = new() 
@@ -63,15 +74,15 @@ namespace GivingCircle.Api.IntegrationTest.Services
                 Tags = new string[] { "testtesttest", }
             };
 
-            response = await httpClient.PutAsJsonAsync(url + "/fundraiser", updateFundraiserRequest);
+            response = await httpClient.PutAsJsonAsync(url + $"/user/{userId}/fundraiser/{fundraiserId}", updateFundraiserRequest);
             response.EnsureSuccessStatusCode();
 
             // Soft Delete the created fundraiser
-            response = await httpClient.DeleteAsync(url + "/fundraiser" + $"/{fundraiserId}/close");
+            response = await httpClient.DeleteAsync(url + $"/user/{userId}/fundraiser/{fundraiserId}/close");
             response.EnsureSuccessStatusCode();
 
             // Hard Delete the created fundraiserSerialized
-            response = await httpClient.DeleteAsync(url + $"/fundraiser/{fundraiserId}");
+            response = await httpClient.DeleteAsync(url + $"/user/{userId}/fundraiser/{fundraiserId}");
             response.EnsureSuccessStatusCode();
         }
     }

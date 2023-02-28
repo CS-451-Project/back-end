@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace GivingCircle.Api.DataAccess.Repositories
 {
+    /// <inheritdoc/>
     public class UserRepository : IUserRepository
     {
         private readonly PostgresClient _postgresClient;
@@ -120,6 +121,30 @@ namespace GivingCircle.Api.DataAccess.Repositories
             //If user is not an empty set return true
             return user != null ? true : false;
 
+        }
+
+        public async Task<GetUserResponse> GetUserByEmailAsync(string email)
+        {
+            // The fundraiser to be returned
+            GetUserResponse user;
+
+            // The query string builder
+            StringBuilder queryBuilder = new();
+
+            // The parameters to be given to the query
+            DynamicParameters parameters = new();
+
+            parameters.Add("@Email", email);
+
+            // Construct the query
+            var query = queryBuilder
+                .Append($"SELECT * FROM users ")
+                .Append("WHERE email=@Email ")
+                .ToString();
+
+            user = await _postgresClient.QuerySingleAsync<GetUserResponse>(query, parameters);
+
+            return user ?? null;
         }
     }
 

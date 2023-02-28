@@ -7,6 +7,13 @@ namespace GivingCircle.Api.DataAccess.Repositories
     public interface IUserRepository
     {
         /// <summary>
+        /// Gets a user by their email
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns>The user</returns>
+        Task<GetUserResponse> GetUserByEmailAsync(string email);
+
+        /// <summary>
         /// Gets a user by their id
         /// </summary>
         /// <param name="userId">The users id</param>

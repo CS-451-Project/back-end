@@ -7,22 +7,32 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Text.Encodings.Web;
+using GivingCircle.Api.Providers;
+using GivingCircle.Api.Models;
+using GivingCircle.Api.DataAccess.Responses;
 
 namespace GivingCircle.Api.Authorization
 {
     public class BasicAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
     {
+        private readonly IUserProvider _userProvider;
+
         public BasicAuthenticationHandler(
             IOptionsMonitor<AuthenticationSchemeOptions> options,
             ILoggerFactory logger,
             UrlEncoder encoder,
-            ISystemClock clock)
+            ISystemClock clock,
+            IUserProvider userProvider)
             : base(options, logger, encoder, clock) 
         { 
+            _userProvider = userProvider;
         }
 
         protected async override Task<AuthenticateResult> HandleAuthenticateAsync()
         {
+            // The user retrieved by the provided email
+            GetUserResponse user;
+
             // Reject if there isn't an authorization header
             if (!Request.Headers.ContainsKey("Authorization"))
             {
@@ -50,21 +60,34 @@ namespace GivingCircle.Api.Authorization
 
             // Get the givenUsername and the givenPassword from the header 
             string[] credentialsArray = credentials.Split(":");
-            string givenUsername = credentialsArray[0];
+            string givenEmail = credentialsArray[0];
             string givenPassword = credentialsArray[1];
 
-            // Check if this user exists
-            // var user = await _userRepository.GetUserByUsernameAsync(givenUsername);
+            try
+            {
+                // Get the user by the given email
+                user = await _userProvider.GetUserByEmailAsync(givenEmail);
+            }
+            catch (Exception ex) 
+            { 
+                Console.WriteLine(ex);
+                return AuthenticateResult.Fail("Username password combo invalid");
+            }
+            
+            if (user == null)
+            {
+                return AuthenticateResult.Fail("Username password combo invalid");
+            }
 
-            string userId = "489DA2DA-6885-4099-A241-01111CDBFEB3";
-
-            //if (givenUsername != user.Username || givenPassword != user.Password)
-            //{
-            //    return AuthenticateResult.Fail("Username givenPassword combo invalid");
-            //}
+            // If the returned user doesn't match what we're given, then return authentication failure
+            if (givenEmail != user.Email || givenPassword != user.Password)
+            {
+                return AuthenticateResult.Fail("Username password combo invalid");
+            }
 
             // Generate ticket
-            var claim = new[] { new Claim("UserId", userId) };
+            // Add the user's id to the claims
+            var claim = new[] { new Claim("UserId", user.UserId) }; 
             var identity = new ClaimsIdentity(claim, Scheme.Name);
             var principal = new ClaimsPrincipal(identity);
             var ticket = new AuthenticationTicket(principal, Scheme.Name);
