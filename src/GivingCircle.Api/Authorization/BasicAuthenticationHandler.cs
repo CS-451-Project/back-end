@@ -55,7 +55,7 @@ namespace GivingCircle.Api.Authorization
             // If bad credentials then unauthorized
             if (string.IsNullOrEmpty(credentials))
             {
-                return AuthenticateResult.Fail("Unauthorized");
+                return AuthenticateResult.Fail("Email password combo invalid");
             }
 
             // Get the givenUsername and the givenPassword from the header 
@@ -71,18 +71,18 @@ namespace GivingCircle.Api.Authorization
             catch (Exception ex) 
             { 
                 Console.WriteLine(ex);
-                return AuthenticateResult.Fail("Username password combo invalid");
+                return AuthenticateResult.Fail("Email password combo invalid");
             }
             
             if (user == null)
             {
-                return AuthenticateResult.Fail("Username password combo invalid");
+                return AuthenticateResult.Fail("Email password combo invalid");
             }
 
             // If the returned user doesn't match what we're given, then return authentication failure
             if (givenEmail != user.Email || givenPassword != user.Password)
             {
-                return AuthenticateResult.Fail("Username password combo invalid");
+                return AuthenticateResult.Fail("Email password combo invalid");
             }
 
             // Generate ticket

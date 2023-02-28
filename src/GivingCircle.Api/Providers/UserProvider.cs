@@ -16,7 +16,12 @@ namespace GivingCircle.Api.Providers
 
         public async Task<GetUserResponse> GetUserByEmailAsync(string email)
         {
-            return await _userRepository.GetUserByEmailAsync(email);
+            // The user we're trying to get
+            GetUserResponse user;
+
+            user = await _userRepository.GetUserByEmailAsync(email);
+
+            return user ?? null;
         }
     }
 }
