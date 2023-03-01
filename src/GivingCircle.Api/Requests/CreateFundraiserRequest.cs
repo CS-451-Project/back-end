@@ -4,7 +4,7 @@ namespace GivingCircle.Api.Requests
 {
     /// <summary>
     /// A create fundraiser request for 
-    /// <see cref="Controllers.FundraiserController.CreateFundraiser(string, string, string, double, string, string, string, string[])"/>
+    /// <see cref="Controllers.FundraiserController.CreateUser(string, string, string, double, string, string, string, string[])"/>
     /// </summary>
     public class CreateFundraiserRequest
     {

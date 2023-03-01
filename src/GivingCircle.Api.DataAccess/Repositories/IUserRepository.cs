@@ -18,7 +18,7 @@ namespace GivingCircle.Api.DataAccess.Repositories
         /// </summary>
         /// <param name="userId">The users id</param>
         /// <returns>the user object</returns>
-        Task<GetUserResponse> GetUserAsync(string userId);
+        Task<GetUserResponse> GetUserAsync(string email);
 
         /// <summary>
         /// Creates a user
@@ -49,7 +49,9 @@ namespace GivingCircle.Api.DataAccess.Repositories
         /// <param name="email">The users email</param>
         /// <param name="password"> The users password</param>
         /// <returns>True if validated, else false</returns>
+
         Task<bool> ValidateUserAsync(string email, string password);
+
 
 
     }
