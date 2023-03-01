@@ -11,5 +11,7 @@ namespace GivingCircle.Api.Providers
         /// <param name="email">The user's email</param>
         /// <returns>A user if they exist, null if they don't</returns>
         Task<GetUserResponse> GetUserByEmailAsync(string email);
+
+        Task<string> ValidateUserAsync(string email, string password);
     }
 }

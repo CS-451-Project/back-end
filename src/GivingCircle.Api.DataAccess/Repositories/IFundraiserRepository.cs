@@ -1,4 +1,5 @@
 ﻿using GivingCircle.Api.DataAccess.Responses;
+using GivingCircle.Api.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -37,7 +38,7 @@ namespace GivingCircle.Api.DataAccess.Repositories
         /// </summary>
         /// <param name="fundraiser">The given fundraiser</param>
         /// <returns>True if success, false or an error if failure</returns>
-        Task<bool> CreateFundraiserAsync(Models.Fundraiser fundraiser);
+        Task<bool> CreateFundraiserAsync(string userId, Fundraiser fundraiser);
 
         /// <summary>
         /// Updates the fundraiser using the given object
@@ -45,7 +46,7 @@ namespace GivingCircle.Api.DataAccess.Repositories
         /// <param name="fundraiserId">The fundraiser's id</param>
         /// <param name="fundraiser">The fundraiser to update to</param>
         /// <returns>True if success, false or an error if un successful</returns>
-        Task<bool> UpdateFundraiserAsync(string fundraiserId, Models.Fundraiser fundraiser);
+        Task<bool> UpdateFundraiserAsync(string userId, string fundraiserId, Fundraiser fundraiser);
 
         /// <summary>
         /// Deletes a fundraiser. Note that we perform a "soft delete", where the fundraiser isn't
@@ -54,13 +55,13 @@ namespace GivingCircle.Api.DataAccess.Repositories
         /// </summary>
         /// <param name="fundraiserId">The fundraiser's id</param>
         /// <returns>True if success, else false or an error</returns>
-        Task<bool> DeleteFundraiserAsync(string fundraiserId);
+        Task<bool> DeleteFundraiserAsync(string userId, string fundraiserId);
 
         /// <summary>
         /// Permanently deletes a fundraiser
         /// </summary>
         /// <param name="fundraiserId">The fundraiser's id</param>
         /// <returns>True if success, else false if an error</returns>
-        Task<bool> HardDeleteFundraiserAsync(string fundraiserId);
+        Task<bool> HardDeleteFundraiserAsync(string userId, string fundraiserId);
     }
 }

@@ -22,8 +22,6 @@ namespace GivingCircle.Api.DataAccess.Repositories
             _postgresClient = postgresClient;
         }
 
-        //USER METHODS
-
         public async Task<GetUserResponse> GetUserAsync(string email)
         {
             // Object to map the parameters to the query
@@ -110,19 +108,16 @@ namespace GivingCircle.Api.DataAccess.Repositories
             return deleteUser == 1 ? true : false;
         }
 
-        public async Task<bool> ValidateUserAsync(string email, string password)
-
+        public async Task<string> ValidateUserAsync(string email, string password)
         {
-            StringBuilder query = new StringBuilder();
-
             // Object to map the parameters to the query
             object parameters = new { Email = email, Password = password };
 
-            // Will return 1 if successful
-            var user = await _postgresClient.QuerySingleAsync<GetUserResponse>("SELECT * FROM users WHERE email = @Email && password = @Password", parameters);
+            // Will return the user id if successful
+            var userId = await _postgresClient.QuerySingleAsync<string>("SELECT u.user_id FROM users u WHERE email = @Email AND password = @Password", parameters);
 
-            //If user is not an empty set return true
-            return user != null ? true : false;
+            // Return the id if they exist or else null
+            return userId ?? null;
 
         }
 

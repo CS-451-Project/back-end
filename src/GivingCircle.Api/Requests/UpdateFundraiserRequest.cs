@@ -1,19 +1,20 @@
 ﻿namespace GivingCircle.Api.Requests
 {
-    public class UpdateUserRequest
+    public class UpdateFundraiserRequest
     {
-        // The User's Name
-        public string FirstName { get; set; }
+        // The fundraiser description
+        public string Description { get; set; }
 
-  
-        public string MiddleInitial { get; set; }
+        // The fundraisers displayed name / title
+        public string Title { get; set; }
 
-        public string LastName { get; set; }
+        // The planned end date
+        public string PlannedEndDate { get; set; }
 
-        // The user's password
-        public string Password { get; set; }
+        // The fundraiser's target amount to raise
+        public double GoalTargetAmount { get; set; }
 
-        // The user's email
-        public double Email { get; set; }
+        // The tags 
+        public string[] Tags { get; set; }
     }
 }

@@ -53,9 +53,10 @@ namespace GivingCircle.Api.Controllers
                     Routing_Num = bankaccount.Routing_Num,
                     Account_Type = bankaccount.Account_Type,
                     Bank_Account_Id = bankaccountid,
+                    User_Id= userId,
                   };
 
-                result = await _bankAccountRepository.AddBankAccount(addBankAccount);
+                result = await _bankAccountRepository.AddBankAccount(userId, addBankAccount);
             }
             catch (Exception err)
             {
@@ -77,7 +78,7 @@ namespace GivingCircle.Api.Controllers
             _logger.LogInformation("Received GET request");
             try
             {
-                result = await _bankAccountRepository.GetBankAccount(bankAccountId);
+                result = await _bankAccountRepository.GetBankAccount(userId, bankAccountId);
             }
             catch (Exception err)
             {
@@ -99,7 +100,7 @@ namespace GivingCircle.Api.Controllers
 
             try
             {
-                result = await _bankAccountRepository.DeleteBankAccountAsync(bankAccountId);
+                result = await _bankAccountRepository.DeleteBankAccountAsync(userId, bankAccountId);
             }
             catch (Exception err)
             {

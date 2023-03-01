@@ -203,10 +203,31 @@ namespace GivingCircle.Api.DataAccess.Repositories
             return fundraisers ?? Enumerable.Empty<GetFundraiserResponse>();
         }
 
-        public async Task<bool> CreateFundraiserAsync(Fundraiser fundraiser)
+        public async Task<bool> CreateFundraiserAsync(string userId, Fundraiser fundraiser)
         {
             // The string builder
             StringBuilder queryBuilder = new();
+
+            // Parameters dictionary
+            Dictionary<string, object> parametersDictionary = new()
+            {
+                { "@PictureId",  fundraiser.PictureId },
+                { "@Description",  fundraiser.Description },
+                { "@Title", fundraiser.Title},
+                { "@PlannedEndDate", fundraiser.PlannedEndDate },
+                { "@GoalTargetAmount", fundraiser.GoalTargetAmount },
+                { "@Tags", fundraiser.Tags },
+                { "@FundraiserId", fundraiser.FundraiserId },
+                { "@BankInformationId", fundraiser.BankInformationId },
+                { "@GoalReachedDate", fundraiser.GoalReachedDate },
+                { "@CurrentBalanceAmount", fundraiser.CurrentBalanceAmount },
+                { "@CreatedDate", fundraiser.CreatedDate },
+                { "@ClosedDate", fundraiser.ClosedDate },
+                { "@OrganizerId", userId }
+            };
+
+            // The parameters
+            DynamicParameters parameters = new DynamicParameters(parametersDictionary);
 
             // This represents the number of rows effected by our query
             int createdResult;
@@ -220,13 +241,13 @@ namespace GivingCircle.Api.DataAccess.Repositories
                 .Append("@CreatedDate,@PlannedEndDate, @GoalReachedDate, @ClosedDate, @GoalTargetAmount, @CurrentBalanceAmount, @Tags)")
                 .ToString();
 
-            createdResult = await _postgresClient.ExecuteAsync(query, fundraiser);
+            createdResult = await _postgresClient.ExecuteAsync(query, parameters);
 
             // If we created 1 new fundraiser then we succeeded
             return (createdResult == 1);
         }
 
-        public async Task<bool> UpdateFundraiserAsync(string fundraiserId, Fundraiser fundraiser)
+        public async Task<bool> UpdateFundraiserAsync(string userId, string fundraiserId, Fundraiser fundraiser)
         {
             // The string builder
             StringBuilder queryBuilder = new();
@@ -243,7 +264,8 @@ namespace GivingCircle.Api.DataAccess.Repositories
                 { "@PlannedEndDate", fundraiser.PlannedEndDate },
                 { "@GoalTargetAmount", fundraiser.GoalTargetAmount },
                 { "@Tags", fundraiser.Tags },
-                { "@FundraiserId", fundraiserId }
+                { "@FundraiserId", fundraiserId },
+                { "@OrganizerId", userId},
             };
 
             // The query parameters
@@ -257,7 +279,7 @@ namespace GivingCircle.Api.DataAccess.Repositories
                 .Append("planned_end_date = @PlannedEndDate, ")
                 .Append("goal_target_amount = @GoalTargetAmount, ")
                 .Append("tags = @Tags ")
-                .Append("WHERE fundraiser_id = @FundraiserId ")
+                .Append("WHERE fundraiser_id = @FundraiserId  AND organizer_id = @OrganizerId")
                 .ToString();
 
             updatedResult = await _postgresClient.ExecuteAsync(query, parameters);
@@ -266,7 +288,7 @@ namespace GivingCircle.Api.DataAccess.Repositories
             return (updatedResult == 1);
         }
 
-        public async Task<bool> DeleteFundraiserAsync(string fundraiserId)
+        public async Task<bool> DeleteFundraiserAsync(string userId, string fundraiserId)
         {
             // The query string builder
             StringBuilder queryBuilder = new();
@@ -282,12 +304,13 @@ namespace GivingCircle.Api.DataAccess.Repositories
 
             parameters.Add("@ClosedDate", closedDate);
             parameters.Add("@FundraiserId", fundraiserId);
+            parameters.Add("@OrganizerId", userId);
 
             // Build the query
             var query = queryBuilder
                 .Append($"UPDATE {_tableName} ")
                 .Append("SET closed_date = @ClosedDate ")
-                .Append("WHERE fundraiser_id = @FundraiserId")
+                .Append("WHERE fundraiser_id = @FundraiserId AND organizer_id = @OrganizerId")
                 .ToString();
 
             deletedResult = await _postgresClient.ExecuteAsync(query, parameters);
@@ -295,7 +318,7 @@ namespace GivingCircle.Api.DataAccess.Repositories
             return (deletedResult == 1);
         }
 
-        public async Task<bool> HardDeleteFundraiserAsync(string fundraiserId)
+        public async Task<bool> HardDeleteFundraiserAsync(string userId, string fundraiserId)
         {
             // The query string builder
             StringBuilder queryBuilder = new();
@@ -304,10 +327,11 @@ namespace GivingCircle.Api.DataAccess.Repositories
             DynamicParameters parameters = new();
 
             parameters.Add("@FundraiserId", fundraiserId);
+            parameters.Add("@OrganizerId", userId);
 
             var query = queryBuilder
                 .Append($"DELETE FROM {_tableName} ")
-                .Append("WHERE fundraiser_id=@FundraiserId")
+                .Append("WHERE fundraiser_id=@FundraiserId AND organizer_id = @OrganizerId")
                 .ToString();
 
             await _postgresClient.ExecuteAsync(query, parameters);

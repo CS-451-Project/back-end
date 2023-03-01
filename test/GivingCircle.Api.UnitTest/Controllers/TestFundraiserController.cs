@@ -74,7 +74,7 @@ namespace GivingCircle.Api.UnitTest.Controllers
 
             var fundraiserRepositoryMock = new Mock<IFundraiserRepository>();
             fundraiserRepositoryMock
-                .Setup(x => x.UpdateFundraiserAsync(fundraiserId, It.IsAny<Fundraiser>()))
+                .Setup(x => x.UpdateFundraiserAsync(userId, fundraiserId, It.IsAny<Fundraiser>()))
                 .ReturnsAsync(true);
 
             var loggerMock = new Mock<ILogger<FundraiserController>>();
@@ -219,7 +219,7 @@ namespace GivingCircle.Api.UnitTest.Controllers
             var userId = Guid.NewGuid().ToString();
 
             var fundraiserRepositoryMock = new Mock<IFundraiserRepository>();
-            fundraiserRepositoryMock.Setup(r => r.HardDeleteFundraiserAsync(It.IsAny<string>()))
+            fundraiserRepositoryMock.Setup(r => r.HardDeleteFundraiserAsync(userId, It.IsAny<string>()))
                 .ReturnsAsync(true);
 
             var loggerMock = new Mock<ILogger<FundraiserController>>();
@@ -245,7 +245,7 @@ namespace GivingCircle.Api.UnitTest.Controllers
             var userId = Guid.NewGuid().ToString();
 
             var fundraiserRepositoryMock = new Mock<IFundraiserRepository>();
-            fundraiserRepositoryMock.Setup(r => r.DeleteFundraiserAsync(It.IsAny<string>()))
+            fundraiserRepositoryMock.Setup(r => r.DeleteFundraiserAsync(userId, It.IsAny<string>()))
                 .ReturnsAsync(true);
 
             var loggerMock = new Mock<ILogger<FundraiserController>>();
@@ -279,7 +279,7 @@ namespace GivingCircle.Api.UnitTest.Controllers
             };
 
             var fundraiserRepositoryMock = new Mock<IFundraiserRepository>();
-            fundraiserRepositoryMock.Setup(r => r.CreateFundraiserAsync(It.IsAny<Fundraiser>()))
+            fundraiserRepositoryMock.Setup(r => r.CreateFundraiserAsync(userId, It.IsAny<Fundraiser>()))
                 .ReturnsAsync(true);
 
             var loggerMock = new Mock<ILogger<FundraiserController>>();

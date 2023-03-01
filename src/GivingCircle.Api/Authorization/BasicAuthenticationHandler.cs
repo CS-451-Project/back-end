@@ -30,8 +30,8 @@ namespace GivingCircle.Api.Authorization
 
         protected async override Task<AuthenticateResult> HandleAuthenticateAsync()
         {
-            // The user retrieved by the provided email
-            GetUserResponse user;
+            // The user id returned, if the user exists
+            string userId;
 
             // Reject if there isn't an authorization header
             if (!Request.Headers.ContainsKey("Authorization"))
@@ -65,8 +65,8 @@ namespace GivingCircle.Api.Authorization
 
             try
             {
-                // Get the user by the given email
-                user = await _userProvider.GetUserByEmailAsync(givenEmail);
+                // See if the user is valid
+                userId = await _userProvider.ValidateUserAsync(givenEmail, givenPassword);
             }
             catch (Exception ex) 
             { 
@@ -74,20 +74,14 @@ namespace GivingCircle.Api.Authorization
                 return AuthenticateResult.Fail("Email password combo invalid");
             }
             
-            if (user == null)
-            {
-                return AuthenticateResult.Fail("Email password combo invalid");
-            }
-
-            // If the returned user doesn't match what we're given, then return authentication failure
-            if (givenEmail != user.Email || givenPassword != user.Password)
+            if (userId == null || string.Equals(userId, ""))
             {
                 return AuthenticateResult.Fail("Email password combo invalid");
             }
 
             // Generate ticket
             // Add the user's id to the claims
-            var claim = new[] { new Claim("UserId", user.UserId) }; 
+            var claim = new[] { new Claim("UserId", userId) }; 
             var identity = new ClaimsIdentity(claim, Scheme.Name);
             var principal = new ClaimsPrincipal(identity);
             var ticket = new AuthenticationTicket(principal, Scheme.Name);

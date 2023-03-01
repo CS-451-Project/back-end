@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace GivingCircle.Api.Models
+﻿namespace GivingCircle.Api.Models
 {
     public class User
     {

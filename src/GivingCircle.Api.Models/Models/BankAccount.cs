@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace GivingCircle.Api.Models
+﻿namespace GivingCircle.Api.Models
 {
     public class BankAccount
     {
-        //Some of these variables might be changed/modified in the future
         public string Account_Name { get; set; }
         public string Address { get; set; }
         public string City { get; set; }
@@ -19,5 +12,6 @@ namespace GivingCircle.Api.Models
         public string Routing_Num { get; set; }
         public string Account_Type { get; set; }
         public string Bank_Account_Id { get; set; }
+        public string User_Id { get; set; }
     }
 }
