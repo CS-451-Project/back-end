@@ -20,8 +20,6 @@ namespace GivingCircle.Api.DataAccess.Repositories
             _postgresClient = postgresClient;
         }
 
-        //BANK ACCOUNT METHODS
-
         public async Task<BankAccount> GetBankAccount(string userId, string bankAccountId)
         {
             // Object to map the parameters to the query
