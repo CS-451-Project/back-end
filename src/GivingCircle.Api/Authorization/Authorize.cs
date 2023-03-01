@@ -26,19 +26,6 @@ namespace GivingCircle.Api.Authorization
 
             // The user id in the route
             var routeUserId = pathItems[3];
-
-            // Requesting access to resource other than user if path is this long
-            //if (pathItems.Length > 5) 
-            //{
-            //    var requestedUserId = pathItems[3];
-            //    var requestedResourceId = pathItems[5];
-            //}
-            //// Else it is an implicit user object or creating an object
-            //else
-            //{
-            //    var requestedUserId = pathItems[3];
-            //    var requestedResourceId = pathItems[3];
-            //}
             
             // Grab the claims user id
             var requestingUserId = context.HttpContext.User.Claims.FirstOrDefault(c => c.Type == "UserId").Value;
