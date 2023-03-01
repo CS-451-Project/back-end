@@ -1,4 +1,5 @@
 ﻿using GivingCircle.Api.Providers;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System;
 using System.Linq;
@@ -23,31 +24,19 @@ namespace GivingCircle.Api.Authorization
             var path = context.HttpContext.Request.Path.ToString();
             var pathItems = path.Split("/");
 
-            // Requesting access to resource other than user if path is this long
-            if (pathItems.Length > 5) 
-            {
-                var requestedUserId = pathItems[3];
-                var requestedResourceId = pathItems[5];
-            }
-            // Else it is an implicit user object or creating an object
-            else
-            {
-                var requestedUserId = pathItems[3];
-                var requestedResourceId = pathItems[3];
-            }
+            // The user id in the route
+            var routeUserId = pathItems[3];
             
             // Grab the claims user id
-            var claimsUserId = context.HttpContext.User.Claims.FirstOrDefault(c => c.Type == "UserId").Value;
+            var requestingUserId = context.HttpContext.User.Claims.FirstOrDefault(c => c.Type == "UserId").Value;
 
             // Make sure that the claims user id matches the route user id
             // If it doesn't then they are forbidden
-            //if (claimsUserId != requestedUserId) 
-            //{
-            //    context.Result = new ForbidResult();
-            //    return Task.CompletedTask;
-            //}
-
-            // TODO: Finish this. Authorizing everyone for now
+            if (requestingUserId != routeUserId)
+            {
+                context.Result = new ForbidResult();
+                return Task.CompletedTask;
+            }
 
             // If they don't return forbidden, else authorize success
             return Task.CompletedTask;

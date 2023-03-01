@@ -33,7 +33,7 @@ namespace GivingCircle.Api.UnitTest.Controllers
             };
 
             var bankAccountRepositoryMock = new Mock<IBankAccountRepository>();
-            bankAccountRepositoryMock.Setup(r => r.AddBankAccount(It.IsAny<BankAccount>()))
+            bankAccountRepositoryMock.Setup(r => r.AddBankAccount(userId, It.IsAny<BankAccount>()))
                 .ReturnsAsync(true);
 
             var loggerMock = new Mock<ILogger<BankAccountController>>();
@@ -57,7 +57,7 @@ namespace GivingCircle.Api.UnitTest.Controllers
             var userId = Guid.NewGuid().ToString();
 
             var bankAccountRepositoryMock = new Mock<IBankAccountRepository>();
-            bankAccountRepositoryMock.Setup(r => r.DeleteBankAccountAsync(Bank_Account_Id))
+            bankAccountRepositoryMock.Setup(r => r.DeleteBankAccountAsync(userId, Bank_Account_Id))
                 .ReturnsAsync(true);
 
             var loggerMock = new Mock<ILogger<BankAccountController>>();
@@ -96,7 +96,7 @@ namespace GivingCircle.Api.UnitTest.Controllers
 
             var bankAccountRepositoryMock = new Mock<IBankAccountRepository>();
             bankAccountRepositoryMock
-                .Setup(r => r.GetBankAccount(bankAccountId))
+                .Setup(r => r.GetBankAccount(userId, bankAccountId))
                 .ReturnsAsync(bankAccount);
 
             var loggerMock = new Mock<ILogger<BankAccountController>>();

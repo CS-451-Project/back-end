@@ -225,7 +225,7 @@ namespace GivingCircle.Api.Controllers
                     Tags = request.Tags
                 };
 
-                result = await _fundraiserRepository.CreateFundraiserAsync(fundraiser);
+                result = await _fundraiserRepository.CreateFundraiserAsync(userId, fundraiser);
             }
             catch (Exception err)
             {
@@ -268,7 +268,7 @@ namespace GivingCircle.Api.Controllers
                     Tags = request.Tags
                 };
 
-                updateFundraiserResult = await _fundraiserRepository.UpdateFundraiserAsync(fundraiserId, fundraiser);
+                updateFundraiserResult = await _fundraiserRepository.UpdateFundraiserAsync(userId, fundraiserId, fundraiser);
             }
             catch (Exception err)
             {
@@ -297,7 +297,7 @@ namespace GivingCircle.Api.Controllers
                 // Validate the given id
                 Guid.Parse(fundraiserId);
 
-                deletedFundraiserResult = await _fundraiserRepository.DeleteFundraiserAsync(fundraiserId);
+                deletedFundraiserResult = await _fundraiserRepository.DeleteFundraiserAsync(userId, fundraiserId);
             }
             catch (System.FormatException err)
             {
@@ -340,7 +340,7 @@ namespace GivingCircle.Api.Controllers
                 // Validate the given id
                 Guid.Parse(fundraiserId);
 
-                result = await _fundraiserRepository.HardDeleteFundraiserAsync(fundraiserId);
+                result = await _fundraiserRepository.HardDeleteFundraiserAsync(userId, fundraiserId);
             }
             catch (System.FormatException err)
             {

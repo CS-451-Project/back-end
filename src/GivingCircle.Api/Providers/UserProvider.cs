@@ -23,5 +23,15 @@ namespace GivingCircle.Api.Providers
 
             return user ?? null;
         }
+
+        public async Task<string> ValidateUserAsync(string email, string password)
+        {
+            // The user's id, if they exist
+            string userId;
+
+            userId = await _userRepository.ValidateUserAsync(email, password);
+
+            return userId ?? null;
+        }
     }
 }

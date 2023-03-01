@@ -50,7 +50,7 @@ namespace GivingCircle.Api.DataAccess.Repositories
         /// <param name="password"> The users password</param>
         /// <returns>True if validated, else false</returns>
 
-        Task<bool> ValidateUserAsync(string email, string password);
+        Task<string> ValidateUserAsync(string email, string password);
 
 
 
