@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace GivingCircle.Api.DataAccess.Repositories
 {
+    /// <inheritdoc/>
     public class UserRepository : IUserRepository
     {
         private readonly PostgresClient _postgresClient;
@@ -30,6 +31,7 @@ namespace GivingCircle.Api.DataAccess.Repositories
 
             var user = await _postgresClient.QuerySingleAsync<GetUserResponse>("SELECT * FROM users WHERE email = @Email", parameters);
 
+
             return user ?? null;
         }
 
@@ -43,9 +45,9 @@ namespace GivingCircle.Api.DataAccess.Repositories
 
             // Construct the query
             var query = queryBuilder
-                .Append($"INSERT INTO users")
-                .Append("(user_id, first_name, middle_initial, last_name, password, email, created_date, planned_end_date)")
-                .Append("VALUES (@UserId, @FirstName, @MiddleInitial, @LastName, @Password, @email)")
+                .Append($"INSERT INTO users ")
+                .Append("(user_id, first_name, middle_initial, last_name, password, email, created_date, planned_end_date) ")
+                .Append("VALUES (@UserId, @FirstName, @MiddleInitial, @LastName, @Password, @email) ")
                 .ToString();
 
             createdResult = await _postgresClient.ExecuteAsync(query, user);
@@ -102,12 +104,14 @@ namespace GivingCircle.Api.DataAccess.Repositories
             // Will return 1 if successful
             var deleteUser = await _postgresClient.ExecuteAsync(query
                 .Append("DELETE FROM users ")
-                .Append("WHERE user_id = @User_Id").ToString(),
+                .Append("WHERE user_id = @User_Id ").ToString(),
                 parameters);
 
             return deleteUser == 1 ? true : false;
         }
-        public async Task<bool> ValidateUserIdAsync(string email, string password)
+
+        public async Task<bool> ValidateUserAsync(string email, string password)
+
         {
             StringBuilder query = new StringBuilder();
 
@@ -120,6 +124,30 @@ namespace GivingCircle.Api.DataAccess.Repositories
             //If user is not an empty set return true
             return user != null ? true : false;
 
+        }
+
+        public async Task<GetUserResponse> GetUserByEmailAsync(string email)
+        {
+            // The fundraiser to be returned
+            GetUserResponse user;
+
+            // The query string builder
+            StringBuilder queryBuilder = new();
+
+            // The parameters to be given to the query
+            DynamicParameters parameters = new();
+
+            parameters.Add("@Email", email);
+
+            // Construct the query
+            var query = queryBuilder
+                .Append($"SELECT * FROM users ")
+                .Append("WHERE email=@Email ")
+                .ToString();
+
+            user = await _postgresClient.QuerySingleAsync<GetUserResponse>(query, parameters);
+
+            return user ?? null;
         }
     }
 

@@ -7,6 +7,13 @@ namespace GivingCircle.Api.DataAccess.Repositories
     public interface IUserRepository
     {
         /// <summary>
+        /// Gets a user by their email
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns>The user</returns>
+        Task<GetUserResponse> GetUserByEmailAsync(string email);
+
+        /// <summary>
         /// Gets a user by their id
         /// </summary>
         /// <param name="userId">The users id</param>
@@ -39,10 +46,12 @@ namespace GivingCircle.Api.DataAccess.Repositories
         /// <summary>
         /// Validates User
         /// </summary>
-        /// <param name="userId">The users id</param>
+        /// <param name="email">The users email</param>
         /// <param name="password"> The users password</param>
         /// <returns>True if validated, else false</returns>
-        Task<bool> ValidateUserIdAsync(string email, string password);
+
+        Task<bool> ValidateUserAsync(string email, string password);
+
 
 
     }
