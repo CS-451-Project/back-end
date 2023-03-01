@@ -9,7 +9,7 @@ using Moq;
 using System;
 using Xunit;
 
-namespace GivingCircle.Api.UnitTest.ControllersKC
+namespace GivingCircle.Api.UnitTest.Controllers
 {
     public class TestBankAccountController
     {

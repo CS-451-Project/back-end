@@ -242,6 +242,8 @@ namespace GivingCircle.Api.UnitTest.Controllers
             // Given
             var fundraiserId = Guid.NewGuid().ToString();
 
+            var userId = Guid.NewGuid().ToString();
+
             var fundraiserRepositoryMock = new Mock<IFundraiserRepository>();
             fundraiserRepositoryMock.Setup(r => r.DeleteFundraiserAsync(It.IsAny<string>()))
                 .ReturnsAsync(true);
@@ -254,7 +256,7 @@ namespace GivingCircle.Api.UnitTest.Controllers
                 );
 
             // When
-            var result = await controllerMock.CloseFundraiser(fundraiserId) as StatusCodeResult;
+            var result = await controllerMock.CloseFundraiser(userId, fundraiserId) as StatusCodeResult;
 
             // Then
             Assert.Equal(StatusCodes.Status200OK, result.StatusCode);

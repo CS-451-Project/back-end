@@ -286,8 +286,8 @@ namespace GivingCircle.Api.Controllers
         /// <param name="fundraiserId">The fundraiser's id</param>
         /// <returns>Status 200 if success, error codes if failure</returns>
         [TypeFilter(typeof(Authorize))]
-        [HttpDelete("user/fundraiser/{fundraiserId}/close")]
-        public async Task<IActionResult> CloseFundraiser(string fundraiserId)
+        [HttpDelete("user/{userId}/fundraiser/{fundraiserId}/close")]
+        public async Task<IActionResult> CloseFundraiser(string userId, string fundraiserId)
         {
             // The deleted result. True if success, false if errors
             bool deletedFundraiserResult;

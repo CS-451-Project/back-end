@@ -16,8 +16,4 @@
     <ProjectReference Include="..\GivingCircle.Api.Models\GivingCircle.Api.Models.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Providers\" />
-  </ItemGroup>
-
 </Project>
