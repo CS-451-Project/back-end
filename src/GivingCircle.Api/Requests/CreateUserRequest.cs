@@ -28,6 +28,6 @@ namespace GivingCircle.Api.Requests
         // The users email
         [Required]
         public string Email { get; set; }
-=
+
     }
 }

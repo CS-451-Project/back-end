@@ -31,33 +31,28 @@ namespace GivingCircle.Api.Controllers
 
         [TypeFilter(typeof(Authorize))]
         [HttpPost("user/{userId}/users")]
-        public async Task<IActionResult> CreateUserAsync(User user, [FromBody] CreateUserAsyncRequest bankaccount)
+        public async Task<IActionResult> CreateUserAsync( [FromBody] CreateUserRequest user)
         {
             _logger.LogInformation("Received POST request");
             var result = false;
-            string bankaccountid;
+            string userId;
 
             try
             {
                 // Create the bank account id
-                bankaccountid = Guid.NewGuid().ToString();
+                userId = Guid.NewGuid().ToString();
 
-                //Bank Account Object
-                BankAccount addBankAccount = new()
+                //create user object
+                User addUser = new()
                 {
-                    Account_Name = bankaccount.Account_Name,
-                    Address = bankaccount.Address,
-                    City = bankaccount.City,
-                    State = bankaccount.State,
-                    Zipcode = bankaccount.Zipcode,
-                    Bank_Name = bankaccount.Bank_Name,
-                    Account_Num = bankaccount.Account_Num,
-                    Routing_Num = bankaccount.Routing_Num,
-                    Account_Type = bankaccount.Account_Type,
-                    Bank_Account_Id = bankaccountid,
-                  };
+                    UserId = userId,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Email = user.Email,
+                    Password = user.Password,
+                };
 
-                result = await _bankAccountRepository.AddBankAccount(addBankAccount);
+                result = await _userRepository.CreateUserAsync(addUser);
             }
             catch (Exception err)
             {
@@ -66,20 +61,20 @@ namespace GivingCircle.Api.Controllers
             }
 
             //return result ? StatusCode(201) : StatusCode(500);
-            return (result) ? Created("user/{userId}/bankaccount", bankaccountid) : StatusCode(500, "Something went wrong");
+            return (result) ? Created("user/{userId}/users", userId) : StatusCode(500, "Something went wrong");
         }
 
         [TypeFilter(typeof(Authorize))]
-        [HttpGet("user/{userId}/bankaccount/{bankAccountId}")]
-        public async Task<IActionResult> GetAccount(string userId, string bankAccountId)
+        [HttpGet("user/{userId}")]
+        public async Task<IActionResult> GetUserAsync(string email)
         {
 
-            BankAccount result;
+            GetUserResponse user;
 
             _logger.LogInformation("Received GET request");
             try
             {
-                result = await _bankAccountRepository.GetBankAccount(bankAccountId);
+                user = await _userRepository.GetUserAsync(email);
             }
             catch (Exception err)
             {
@@ -87,13 +82,13 @@ namespace GivingCircle.Api.Controllers
                 return StatusCode(500, err.Message);
             }
 
-            return Ok(result);
+            return Ok(user);
 
         }
 
         [TypeFilter(typeof(Authorize))]
-        [HttpDelete("user/{userId}/bankaccount/{bankAccountId}")]
-        public async Task<IActionResult> DeleteBankAccount(string userId, string bankAccountId)
+        [HttpDelete("user/{userId}")]
+        public async Task<IActionResult> DeleteBankAccount(string userId)
         {
             _logger.LogInformation("Received DELETE request");
 
@@ -101,7 +96,7 @@ namespace GivingCircle.Api.Controllers
 
             try
             {
-                result = await _bankAccountRepository.DeleteBankAccountAsync(bankAccountId);
+                result = await _userRepository.DeleteUserAsync(userId);
             }
             catch (Exception err)
             {
