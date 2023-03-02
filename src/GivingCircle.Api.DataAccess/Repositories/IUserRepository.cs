@@ -18,7 +18,7 @@ namespace GivingCircle.Api.DataAccess.Repositories
         /// </summary>
         /// <param name="userId">The users id</param>
         /// <returns>the user object</returns>
-        Task<GetUserResponse> GetUserAsync(string email);
+        Task<GetUserResponse> GetUserAsync(string userId);
 
         /// <summary>
         /// Creates a user

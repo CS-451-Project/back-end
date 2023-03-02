@@ -1,4 +1,6 @@
-﻿using GivingCircle.Api.Requests;
+﻿using GivingCircle.Api.DataAccess.Responses;
+using GivingCircle.Api.Models;
+using GivingCircle.Api.Requests;
 using Microsoft.AspNetCore.Mvc.Testing;
 using System;
 using System.Net.Http.Headers;
@@ -11,6 +13,34 @@ namespace GivingCircle.Api.IntegrationTest.Services
 {
     public class TestUserService
     {
+        private readonly User testUser = new ()
+        {
+            UserId = "575B1943-CD13-4771-B698-DE4E1F4E22A7",
+            Email = "azdummy@gmail.com",
+            FirstName = "Albus",
+            LastName = "Dumbledore",
+            Password = "test"
+        };
+
+        [Fact]
+        public async Task TestGetUser()
+        {
+            // Given
+            string url = "https://localhost:7000/api";
+
+            var application = new WebApplicationFactory<Program>();
+
+            var httpClient = application.CreateClient();
+
+            var userId = testUser.UserId;
+
+            var uri = new Uri(url + $"/user/{userId}");
+
+            // Get user
+            var response = await httpClient.GetFromJsonAsync<GetUserResponse>(uri);
+            Assert.Equal(userId, response.UserId);
+        }
+
         [Fact]
         public async Task TestCreateUserLoginAndDelete()
         {
