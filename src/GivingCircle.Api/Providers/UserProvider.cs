@@ -14,16 +14,6 @@ namespace GivingCircle.Api.Providers
             _userRepository= userRepository;
         }
 
-        public async Task<GetUserResponse> GetUserByEmailAsync(string email)
-        {
-            // The user we're trying to get
-            GetUserResponse user;
-
-            user = await _userRepository.GetUserByEmailAsync(email);
-
-            return user ?? null;
-        }
-
         public async Task<string> ValidateUserAsync(string email, string password)
         {
             // The user's id, if they exist

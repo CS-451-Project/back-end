@@ -1,5 +1,4 @@
-﻿using GivingCircle.Api.Providers;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System;
 using System.Linq;
@@ -10,13 +9,6 @@ namespace GivingCircle.Api.Authorization
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     public class Authorize : Attribute, IAsyncAuthorizationFilter
     {
-        private readonly IIdentityRoleProvider _identityRoleProvider;
-
-        public Authorize(IIdentityRoleProvider identityRoleProvider)
-        {
-            _identityRoleProvider= identityRoleProvider;
-        }
-
         public Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
             // Construct the required identity roles from the http context

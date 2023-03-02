@@ -38,10 +38,8 @@ var builder = WebApplication.CreateBuilder(args);
     services.AddSingleton<IFundraiserRepository>(x => new FundraiserRepository(postgresClient));
     services.AddSingleton<IBankAccountRepository>(x => new BankAccountRepository(postgresClient));
     services.AddSingleton<IUserRepository>(x => new UserRepository(postgresClient));
-    services.AddSingleton<IIdentityRoleRepository>(x => new IdentityRoleRepository(postgresClient));
 
     // Register Providers
-    services.AddSingleton<IIdentityRoleProvider, IdentityRoleProvider>();
     services.AddSingleton<IUserProvider, UserProvider>();
 
     // Register automatic fluent validation
@@ -50,6 +48,8 @@ var builder = WebApplication.CreateBuilder(args);
     // Register validators
     services.AddSingleton<IValidator<CreateFundraiserRequest>, CreateFundraiserRequestValidator>();
     services.AddSingleton<IValidator<AddBankAccountRequest>, AddBankAccountRequestValidator>();
+    services.AddSingleton<IValidator<CreateUserRequest>, CreateUserRequestValidator>();
+    services.AddSingleton<IValidator<LoginRequest>, LoginRequestValidator>();
 }
 
 var app = builder.Build();

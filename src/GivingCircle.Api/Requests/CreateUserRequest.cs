@@ -8,10 +8,6 @@ namespace GivingCircle.Api.Requests
     /// </summary>
     public class CreateUserRequest
     {
-        // The user's id
-        [Required]
-        public string UserId { get; set; }
-
         // The user's name items
         [Required]
         public string FirstName { get; set; }

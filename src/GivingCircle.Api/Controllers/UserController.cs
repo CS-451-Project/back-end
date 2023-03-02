@@ -2,12 +2,12 @@
 using GivingCircle.Api.DataAccess.Repositories;
 using GivingCircle.Api.DataAccess.Responses;
 using GivingCircle.Api.Models;
+using GivingCircle.Api.Providers;
 using GivingCircle.Api.Requests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace GivingCircle.Api.Controllers
@@ -21,35 +21,65 @@ namespace GivingCircle.Api.Controllers
 
         private readonly IUserRepository _userRepository;
 
+        private readonly IUserProvider _userProvider;
+
         public UserController(
             ILogger<UserController> logger, 
-            IUserRepository userRepository)
+            IUserRepository userRepository,
+            IUserProvider userProvider)
         {
             _logger = logger;
             _userRepository = userRepository;
+            _userProvider = userProvider;
         }
 
-        [TypeFilter(typeof(Authorize))]
-        [HttpPost("user/{userId}/users")]
-        public async Task<IActionResult> CreateUserAsync( [FromBody] CreateUserRequest user)
+        /// <summary>
+        /// Logs a user in with the given credentials. 
+        /// </summary>
+        /// <param name="email">The user's email</param>
+        /// <param name="password">The user's password</param>
+        /// <returns>The user's id if authentication was successful</returns>
+        [AllowAnonymous]
+        [HttpPost("user/login")]
+        public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
-            _logger.LogInformation("Received POST request");
-            var result = false;
             string userId;
 
             try
             {
-                // Create the bank account id
+                userId = await _userProvider.ValidateUserAsync(request.Email, request.Password);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Something went wrong in the login endpoint");
+                return StatusCode(500, ex.Message);
+            }
+
+            return Ok(userId);
+        }
+
+        [AllowAnonymous]
+        [HttpPost("user")]
+        public async Task<IActionResult> CreateUserAsync( [FromBody] CreateUserRequest request)
+        {
+            _logger.LogInformation("Received POST request");
+            bool result;
+            string userId;
+
+            try
+            {
+                // Create the user id
                 userId = Guid.NewGuid().ToString();
 
                 //create user object
                 User addUser = new()
                 {
                     UserId = userId,
-                    FirstName = user.FirstName,
-                    LastName = user.LastName,
-                    Email = user.Email,
-                    Password = user.Password,
+                    FirstName = request.FirstName,
+                    MiddleInitial = request.MiddleInitial,
+                    LastName = request.LastName,
+                    Email = request.Email,
+                    Password = request.Password,
                 };
 
                 result = await _userRepository.CreateUserAsync(addUser);
@@ -60,11 +90,10 @@ namespace GivingCircle.Api.Controllers
                 return StatusCode(500, err.Message);
             }
 
-            //return result ? StatusCode(201) : StatusCode(500);
-            return (result) ? Created("user/{userId}/users", userId) : StatusCode(500, "Something went wrong");
+            return (result) ? Created("user", userId) : StatusCode(500, "Something went wrong");
         }
 
-        [TypeFilter(typeof(Authorize))]
+        [AllowAnonymous]
         [HttpGet("user/{userId}")]
         public async Task<IActionResult> GetUserAsync(string email)
         {
@@ -88,7 +117,7 @@ namespace GivingCircle.Api.Controllers
 
         [TypeFilter(typeof(Authorize))]
         [HttpDelete("user/{userId}")]
-        public async Task<IActionResult> DeleteBankAccount(string userId)
+        public async Task<IActionResult> DeleteUser(string userId)
         {
             _logger.LogInformation("Received DELETE request");
 

@@ -6,12 +6,11 @@ namespace GivingCircle.Api.Providers
     public interface IUserProvider
     {
         /// <summary>
-        /// Gets the user by email
+        /// Validates a user
         /// </summary>
-        /// <param name="email">The user's email</param>
-        /// <returns>A user if they exist, null if they don't</returns>
-        Task<GetUserResponse> GetUserByEmailAsync(string email);
-
+        /// <param name="email">The users email</param>
+        /// <param name="password">The user's password</param>
+        /// <returns>The user's id if authentication success</returns>
         Task<string> ValidateUserAsync(string email, string password);
     }
 }
