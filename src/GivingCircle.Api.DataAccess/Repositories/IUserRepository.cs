@@ -1,5 +1,5 @@
 ﻿using GivingCircle.Api.DataAccess.Responses;
-using System.Collections.Generic;
+using GivingCircle.Api.Models;
 using System.Threading.Tasks;
 
 namespace GivingCircle.Api.DataAccess.Repositories
@@ -25,8 +25,7 @@ namespace GivingCircle.Api.DataAccess.Repositories
         /// </summary>
         /// <param name="user">The user</param>
         /// <returns>True if success, false or an error if failure</returns>
-        Task<bool> CreateUserAsync(Models.User user);
-
+        Task<bool> CreateUserAsync(User user);
 
         /// <summary>
         /// Updates the user using the given object
@@ -34,7 +33,7 @@ namespace GivingCircle.Api.DataAccess.Repositories
         /// <param name="userId">The user's id</param>
         /// <param name="user">The user to update</param>
         /// <returns>True if success, false or an error if un successful</returns>
-        Task<bool> UpdateUserAsync(string userId, Models.User user);
+        Task<bool> UpdateUserAsync(string userId, User user);
 
         /// <summary>
         /// Permanently deletes a user

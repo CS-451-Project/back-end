@@ -44,7 +44,7 @@ namespace GivingCircle.Api.DataAccess.Repositories
             // Construct the query
             var query = queryBuilder
                 .Append($"INSERT INTO users ")
-                .Append("(user_id, first_name, middle_initial, last_name, password, email, created_date, planned_end_date) ")
+                .Append("(user_id, first_name, middle_initial, last_name, password, email) ")
                 .Append("VALUES (@UserId, @FirstName, @MiddleInitial, @LastName, @Password, @email) ")
                 .ToString();
 
