@@ -36,9 +36,8 @@ namespace GivingCircle.Api.Controllers
         /// <summary>
         /// Logs a user in with the given credentials. 
         /// </summary>
-        /// <param name="email">The user's email</param>
-        /// <param name="password">The user's password</param>
-        /// <returns>The user's id if authentication was successful</returns>
+        /// <param name="request"/>>The login request</param>
+        /// <returns>The user's id if authentication was successful, else an error or nothing</returns>
         [AllowAnonymous]
         [HttpPost("user/login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
@@ -58,6 +57,11 @@ namespace GivingCircle.Api.Controllers
             return Ok(userId);
         }
 
+        /// <summary>
+        /// Creates a new user
+        /// </summary>
+        /// <param name="request">The create user request</param>
+        /// <returns>The user's id if successful, else an error code</returns>
         [AllowAnonymous]
         [HttpPost("user")]
         public async Task<IActionResult> CreateUserAsync( [FromBody] CreateUserRequest request)
@@ -93,17 +97,21 @@ namespace GivingCircle.Api.Controllers
             return (result) ? Created("user", userId) : StatusCode(500, "Something went wrong");
         }
 
+        /// <summary>
+        /// Gets a user by their id
+        /// </summary>
+        /// <param name="userId">The user's id</param>
+        /// <returns>The user</returns>
         [AllowAnonymous]
         [HttpGet("user/{userId}")]
-        public async Task<IActionResult> GetUserAsync(string email)
+        public async Task<IActionResult> GetUser(string userId)
         {
-
             GetUserResponse user;
 
             _logger.LogInformation("Received GET request");
             try
             {
-                user = await _userRepository.GetUserAsync(email);
+                user = await _userRepository.GetUserAsync(userId);
             }
             catch (Exception err)
             {
@@ -112,7 +120,6 @@ namespace GivingCircle.Api.Controllers
             }
 
             return Ok(user);
-
         }
 
         [TypeFilter(typeof(Authorize))]

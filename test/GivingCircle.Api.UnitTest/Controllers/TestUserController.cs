@@ -1,5 +1,6 @@
 ﻿using GivingCircle.Api.Controllers;
 using GivingCircle.Api.DataAccess.Repositories;
+using GivingCircle.Api.DataAccess.Responses;
 using GivingCircle.Api.Models;
 using GivingCircle.Api.Providers;
 using GivingCircle.Api.Requests;
@@ -15,6 +16,44 @@ namespace GivingCircle.Api.UnitTest.Controllers
 {
     public class TestUserController
     {
+        [Fact]
+        public async Task TestGetUserHappyPath()
+        {
+            // Given
+            var userId = Guid.NewGuid().ToString();
+
+            var userResponse = new GetUserResponse 
+            { 
+                UserId = userId, 
+                Email = "test",
+                FirstName = "test",
+                LastName = "test",
+                MiddleInitial = "z" 
+            };
+
+            var userRepositoryMock = new Mock<IUserRepository>();
+            userRepositoryMock
+                .Setup(x => x.GetUserAsync(userId))
+                .ReturnsAsync(userResponse);
+
+            var userProviderMock = new Mock<IUserProvider>();
+
+            var loggerMock = new Mock<ILogger<UserController>>();
+
+            var controllerMock = new UserController(
+                loggerMock.Object,
+                userRepositoryMock.Object,
+                userProviderMock.Object
+                );
+
+            // When
+            var result = await controllerMock.GetUser(userId) as OkObjectResult;
+
+            // Then
+            Assert.Equal(StatusCodes.Status200OK, result.StatusCode);
+            Assert.Equal(userResponse, result.Value);
+        }
+
         [Fact]
         public async Task TestCreateUserHappyPath()
         {
