@@ -180,7 +180,7 @@ namespace GivingCircle.Api.Controllers
         /// </summary>
         /// <param name="request">The create fundraiser request <see cref="CreateFundraiserRequest"/></param>
         /// <returns>Status(201) if successful, failure codes otherwise</returns>
-        [TypeFilter(typeof(Authorize))]
+        [@Authorize]
         [HttpPost("user/{userId}/fundraiser")]
         public async Task<IActionResult> CreateFundraiser(string userId, [FromBody] CreateFundraiserRequest request)
         {
@@ -244,7 +244,7 @@ namespace GivingCircle.Api.Controllers
         /// </summary>
         /// <param name="request" <see cref="UpdateFundraiserRequest"/>>The update fundraiser request</param>
         /// <returns>Status(200) if successful, failure codes otherwise</returns>
-        [TypeFilter(typeof(Authorize))]
+        [@Authorize]
         [HttpPut("user/{userId}/fundraiser/{fundraiserId}")]
         public async Task<IActionResult> UpdateFundraiser(string userId, string fundraiserId, [FromBody] UpdateFundraiserRequest request)
         {
@@ -285,7 +285,7 @@ namespace GivingCircle.Api.Controllers
         /// </summary>
         /// <param name="fundraiserId">The fundraiser's id</param>
         /// <returns>Status 200 if success, error codes if failure</returns>
-        [TypeFilter(typeof(Authorize))]
+        [@Authorize]
         [HttpDelete("user/{userId}/fundraiser/{fundraiserId}/close")]
         public async Task<IActionResult> CloseFundraiser(string userId, string fundraiserId)
         {
@@ -328,7 +328,7 @@ namespace GivingCircle.Api.Controllers
         /// </summary>
         /// <param name="fundraiserId">The fundraiser's id</param>
         /// <returns>Status 200 if success, error codes if failure</returns>
-        [TypeFilter(typeof(Authorize))]
+        [@Authorize]
         [HttpDelete("user/{userId}/fundraiser/{fundraiserId}")]
         public async Task<IActionResult> DeleteFundraiser(string userId, string fundraiserId)
         {

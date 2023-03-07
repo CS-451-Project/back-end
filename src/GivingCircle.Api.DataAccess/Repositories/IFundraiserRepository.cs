@@ -8,6 +8,14 @@ namespace GivingCircle.Api.DataAccess.Repositories
     public interface IFundraiserRepository
     {
         /// <summary>
+        /// Increments the amount column for a fundraiser
+        /// </summary>
+        /// <param name="fundraiserId">The fundraiser's id</param>
+        /// <param name="amount">The amount to add</param>
+        /// <returns>True if success, else failure</returns>
+        Task<bool> MakeDonation(string fundraiserId, double amount);
+
+        /// <summary>
         /// Gets a fundraiser by its id
         /// </summary>
         /// <param name="fundraiserId">The users id</param>

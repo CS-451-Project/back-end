@@ -38,9 +38,11 @@ var builder = WebApplication.CreateBuilder(args);
     services.AddSingleton<IFundraiserRepository>(x => new FundraiserRepository(postgresClient));
     services.AddSingleton<IBankAccountRepository>(x => new BankAccountRepository(postgresClient));
     services.AddSingleton<IUserRepository>(x => new UserRepository(postgresClient));
+    services.AddSingleton<IDonationRepository>(x => new DonationRepository(postgresClient));
 
     // Register Providers
     services.AddSingleton<IUserProvider, UserProvider>();
+    services.AddSingleton<IFundraiserProvider, FundraiserProvider>();
 
     // Register automatic fluent validation
     services.AddFluentValidationAutoValidation();

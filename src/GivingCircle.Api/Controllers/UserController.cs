@@ -111,7 +111,14 @@ namespace GivingCircle.Api.Controllers
             _logger.LogInformation("Received GET request");
             try
             {
+                Guid.Parse(userId);
+
                 user = await _userRepository.GetUserAsync(userId);
+            }
+            catch (FormatException ex)
+            {
+                _logger.LogError(ex.Message);
+                return BadRequest("Invalid id");
             }
             catch (Exception err)
             {
@@ -122,7 +129,7 @@ namespace GivingCircle.Api.Controllers
             return Ok(user);
         }
 
-        [TypeFilter(typeof(Authorize))]
+        [@Authorize]
         [HttpDelete("user/{userId}")]
         public async Task<IActionResult> DeleteUser(string userId)
         {
