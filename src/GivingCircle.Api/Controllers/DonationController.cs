@@ -24,6 +24,12 @@ namespace GivingCircle.Api.Controllers
 
         private readonly IFundraiserProvider _fundraiserProvider;
 
+        /// <summary>
+        /// Controller for the <see cref="Donation"/> resource.
+        /// </summary>
+        /// <param name="logger">The logger</param>
+        /// <param name="donationRepository">The donation repository</param>
+        /// <param name="fundraiserProvider">The fundraiser provider</param>
         public DonationController(
             ILogger<DonationController> logger,
             IDonationRepository donationRepository,
