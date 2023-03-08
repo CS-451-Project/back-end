@@ -54,6 +54,11 @@ namespace GivingCircle.Api.Controllers
                 // Get the donations, if any
                 donations = await _donationRepository.GetFundraiserDonations(fundraiserId);
             }
+            catch (FormatException ex)
+            {
+                _logger.LogError("Bad fundraiser id", ex.Message);
+                return BadRequest("Invalid id");
+            }
             catch (Exception ex)
             {
                 _logger.LogError("Something went wrong", ex.Message);
@@ -124,6 +129,9 @@ namespace GivingCircle.Api.Controllers
 
             try
             {
+                // Validate user id
+                Guid.Parse(userId);
+
                 // Generate the donation id
                 donationId = Guid.NewGuid().ToString();
 
@@ -145,6 +153,11 @@ namespace GivingCircle.Api.Controllers
 
                 // Increment the amount in the fundraiser itself
                 result = await _fundraiserProvider.MakeDonation(donation.FundraiserId, donation.Amount);
+            }
+            catch (FormatException ex)
+            {
+                _logger.LogError("Bad user id", ex.Message);
+                return BadRequest("Invalid id");
             }
             catch (Exception ex) 
             {

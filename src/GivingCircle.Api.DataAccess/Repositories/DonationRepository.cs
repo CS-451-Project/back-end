@@ -1,6 +1,5 @@
 ﻿using Dapper;
 using GivingCircle.Api.DataAccess.Client;
-using GivingCircle.Api.DataAccess.Responses;
 using GivingCircle.Api.Models;
 using System.Collections.Generic;
 using System.Text;
@@ -8,16 +7,22 @@ using System.Threading.Tasks;
 
 namespace GivingCircle.Api.DataAccess.Repositories
 {
+    /// <inheritdoc />
     public class DonationRepository : IDonationRepository
     {
         private readonly PostgresClient _postgresClient;
 
         private readonly string _tableName = "donations";
 
+        /// <summary>
+        /// A repository for managing <see cref="Donation"/> objects
+        /// </summary>
+        /// <param name="postgresClient">The postgres client</param>
         public DonationRepository(PostgresClient postgresClient) 
         {
             _postgresClient = postgresClient;
         }
+
         public async Task<IEnumerable<Donation>> GetFundraiserDonations(string fundraiserId)
         {
             // The fundraiser to be returned
