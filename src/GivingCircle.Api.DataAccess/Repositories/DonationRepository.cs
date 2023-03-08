@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using GivingCircle.Api.DataAccess.Client;
+using GivingCircle.Api.DataAccess.Responses;
 using GivingCircle.Api.Models;
 using System.Collections.Generic;
 using System.Text;
@@ -17,9 +18,28 @@ namespace GivingCircle.Api.DataAccess.Repositories
         {
             _postgresClient = postgresClient;
         }
-        public Task<IEnumerable<Donation>> GetFundraiserDonations(string fundraiserId)
+        public async Task<IEnumerable<Donation>> GetFundraiserDonations(string fundraiserId)
         {
-            throw new System.NotImplementedException();
+            // The fundraiser to be returned
+            IEnumerable<Donation> donations;
+
+            // The query string builder
+            StringBuilder queryBuilder = new();
+
+            // The parameters to be given to the query
+            DynamicParameters parameters = new();
+
+            parameters.Add("@FundraiserId", fundraiserId);
+
+            // Construct the query
+            var query = queryBuilder
+                .Append($"SELECT * FROM {_tableName} ")
+                .Append("WHERE fundraiser_id=@FundraiserId")
+                .ToString();
+
+            donations = await _postgresClient.QueryAsync<Donation>(query, parameters);
+
+            return donations ?? null;
         }
 
         public Task<IEnumerable<Donation>> GetUserDonations(string userId)
@@ -44,9 +64,9 @@ namespace GivingCircle.Api.DataAccess.Repositories
             };
 
             // The parameters
-            DynamicParameters parameters = new DynamicParameters(parametersDictionary);
+            DynamicParameters parameters = new(parametersDictionary);
 
-            // This represents the number of rows effected by our query
+            // This represents the number of rows affected by our query
             int createdResult;
 
             // Construct the query

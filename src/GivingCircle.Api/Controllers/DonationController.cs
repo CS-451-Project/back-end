@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace GivingCircle.Api.Controllers
@@ -33,13 +35,88 @@ namespace GivingCircle.Api.Controllers
         }
 
         /// <summary>
+        /// Gets the donations for a fundraiser
+        /// </summary>
+        /// <param name="fundraiserId">The fundraiser id</param>
+        /// <returns>A list of donations</returns>
+        [AllowAnonymous]
+        [HttpGet("fundraiser/{fundraiserId}/donation")]
+        public async Task<IActionResult> GetFundraiserDonations(string fundraiserId)
+        {
+            // The fundraiser's donations to return
+            IEnumerable<Donation> donations;
+
+            try
+            {
+                // Validate the guid
+                Guid.Parse(fundraiserId);
+
+                // Get the donations, if any
+                donations = await _donationRepository.GetFundraiserDonations(fundraiserId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Something went wrong", ex.Message);
+                return StatusCode(500, "Something went wrong");
+            }
+
+            return Ok(donations) ?? Ok(Enumerable.Empty<Donation>());
+        }
+
+        /// <summary>
+        /// Makes an anonymous donation
+        /// </summary>
+        /// <param name="userId">The user's id</param>
+        /// <param name="request">The request</param>
+        /// <returns>No content if the donation was successfully make, an error status otherwise</returns>
+        [AllowAnonymous]
+        [HttpPost("donation")]
+        public async Task<IActionResult> MakeAnonymousDonation([FromBody] MakeDonationRequest request)
+        {
+            bool result;
+            string donationId;
+
+            try
+            {
+                // Generate the donation id
+                donationId = Guid.NewGuid().ToString();
+
+                // Generate todays date
+                var date = DateTime.Now;
+
+                Donation donation = new()
+                {
+                    DonationId = donationId,
+                    Amount = request.Amount,
+                    Date = date,
+                    FundraiserId = request.FundraiserId,
+                    Message = request.Message,
+                    UserId = null
+                };
+
+                // Create the donation
+                result = await _donationRepository.MakeDonation(donation);
+
+                // Increment the amount in the fundraiser itself
+                result = await _fundraiserProvider.MakeDonation(donation.FundraiserId, donation.Amount);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Error making a donation", ex.Message);
+                return StatusCode(500, "Something went wrong");
+            }
+
+            return (result) ? NoContent() : StatusCode(500, "Something went wrong");
+        }
+
+        /// <summary>
         /// Makes a donation for a user
         /// </summary>
         /// <param name="userId">The user's id</param>
         /// <param name="request">The request</param>
         /// <returns>No content if the donation was successfully make, an error status otherwise</returns>
         [@Authorize]
-        [HttpPost("user/{userId}/donate")]
+        [HttpPost("user/{userId}/donation")]
         public async Task<IActionResult> MakeUserDonation(string userId, [FromBody] MakeDonationRequest request)
         {
             bool result;
