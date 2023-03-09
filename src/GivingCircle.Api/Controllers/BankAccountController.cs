@@ -27,7 +27,7 @@ namespace GivingCircle.Api.Controllers
             _bankAccountRepository = bankAccountRepository;
         }
 
-        [TypeFilter(typeof(Authorize))]
+        [@Authorize]
         [HttpPost("user/{userId}/bankaccount")]
         public async Task<IActionResult> AddBankAccount(string userId, [FromBody] AddBankAccountRequest bankaccount)
         {
@@ -68,7 +68,7 @@ namespace GivingCircle.Api.Controllers
             return (result) ? Created("user/{userId}/bankaccount", bankaccountid) : StatusCode(500, "Something went wrong");
         }
 
-        [TypeFilter(typeof(Authorize))]
+        [@Authorize]
         [HttpGet("user/{userId}/bankaccount/{bankAccountId}")]
         public async Task<IActionResult> GetAccount(string userId, string bankAccountId)
         {
@@ -90,7 +90,7 @@ namespace GivingCircle.Api.Controllers
 
         }
 
-        [TypeFilter(typeof(Authorize))]
+        [@Authorize]
         [HttpDelete("user/{userId}/bankaccount/{bankAccountId}")]
         public async Task<IActionResult> DeleteBankAccount(string userId, string bankAccountId)
         {

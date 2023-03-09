@@ -338,6 +338,35 @@ namespace GivingCircle.Api.DataAccess.Repositories
 
             return true;
         }
+
+        public async Task<bool> MakeDonation(string fundraiserId, double amount)
+        {
+            // The query string builder
+            StringBuilder queryBuilder = new();
+
+            // The dynamic parameters to be supplied to the query
+            DynamicParameters parameters = new();
+
+            // This represents the number of rows effected by our query
+            int donateResult;
+
+            // Generate todays date
+            DateTime closedDate = DateTime.Now;
+
+            parameters.Add("@Amount", amount);
+            parameters.Add("@FundraiserId", fundraiserId);
+
+            // Build the query
+            var query = queryBuilder
+                .Append($"UPDATE {_tableName} ")
+                .Append("SET current_balance_amount = (current_balance_amount + @Amount) ")
+                .Append("WHERE fundraiser_id = @FundraiserId ")
+                .ToString();
+
+            donateResult = await _postgresClient.ExecuteAsync(query, parameters);
+
+            return (donateResult == 1);
+        }
     }
 }
 

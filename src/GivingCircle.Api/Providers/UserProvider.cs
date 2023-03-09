@@ -1,5 +1,4 @@
 ﻿using GivingCircle.Api.DataAccess.Repositories;
-using GivingCircle.Api.DataAccess.Responses;
 using System.Threading.Tasks;
 
 namespace GivingCircle.Api.Providers
