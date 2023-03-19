@@ -118,6 +118,8 @@ namespace GivingCircle.Api.Controllers
                 _logger.LogError(ex.Message);
                 return BadRequest("Invalid id format");
             }
+            // If the sequence conatains no elements then this exception is thrown
+            // That is equivalent to the user not existing
             catch (InvalidOperationException ex)
             {
                 _logger.LogError(ex.Message);

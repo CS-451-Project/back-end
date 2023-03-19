@@ -25,22 +25,10 @@ namespace GivingCircle.Api.DataAccess.Repositories
 
         public async Task<GetUserResponse> GetUserAsync(string userId)
         {
-            GetUserResponse user = null;
-
             // Object to map the parameters to the query
             object parameters = new { UserId = userId };
 
-            try
-            {
-                user = await _postgresClient.QuerySingleAsync<GetUserResponse>("SELECT * FROM users WHERE user_id = @UserId", parameters);
-            }
-            // If the sequence conatains no elements then this exception is thrown
-            // That is equivalent to the user not existing
-            catch (InvalidOperationException ex)
-            {
-                Console.WriteLine(ex);
-                return null;
-            }
+            GetUserResponse user = await _postgresClient.QuerySingleAsync<GetUserResponse>("SELECT * FROM users WHERE user_id = @UserId", parameters);
 
             return user;
         }
