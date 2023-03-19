@@ -52,6 +52,7 @@ var builder = WebApplication.CreateBuilder(args);
     services.AddSingleton<IValidator<AddBankAccountRequest>, AddBankAccountRequestValidator>();
     services.AddSingleton<IValidator<CreateUserRequest>, CreateUserRequestValidator>();
     services.AddSingleton<IValidator<LoginRequest>, LoginRequestValidator>();
+    services.AddSingleton<IValidator<MakeDonationRequest>, MakeDonationRequestValidator>();
 }
 
 var app = builder.Build();
