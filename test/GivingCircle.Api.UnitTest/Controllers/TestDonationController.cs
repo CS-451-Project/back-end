@@ -1,5 +1,6 @@
 ﻿using GivingCircle.Api.Controllers;
 using GivingCircle.Api.DataAccess.Repositories;
+using GivingCircle.Api.DataAccess.Responses;
 using GivingCircle.Api.Models;
 using GivingCircle.Api.Providers;
 using GivingCircle.Api.Requests;
@@ -60,12 +61,15 @@ namespace GivingCircle.Api.UnitTest.Controllers
 
             var fundraiserProviderMock = new Mock<IFundraiserProvider>();
 
+            var userProviderMock = new Mock<IUserProvider>();
+
             var loggerMock = new Mock<ILogger<DonationController>>();
 
             DonationController donationController = new(
                 loggerMock.Object,
                 donationRepositoryMock.Object,
-                fundraiserProviderMock.Object
+                fundraiserProviderMock.Object,
+                userProviderMock.Object
                 );
 
             // When
@@ -89,6 +93,15 @@ namespace GivingCircle.Api.UnitTest.Controllers
                 Message = "test"
             };
 
+            var getUserResponse = new GetUserResponse 
+            {
+                UserId = userId, 
+                Email = "test@test.com", 
+                FirstName = "test", 
+                LastName = "test", 
+                MiddleInitial = "t" 
+            };
+
             var donationRepositoryMock = new Mock<IDonationRepository>();
             donationRepositoryMock
                 .Setup(x => x.MakeDonation(It.IsAny<Donation>()))
@@ -99,12 +112,18 @@ namespace GivingCircle.Api.UnitTest.Controllers
                 .Setup(x => x.MakeDonation(makeDonationRequest.FundraiserId, makeDonationRequest.Amount))
                 .ReturnsAsync(true);
 
+            var userProviderMock = new Mock<IUserProvider>();
+            userProviderMock
+                .Setup(x => x.GetUserAsync(userId))
+                .ReturnsAsync(getUserResponse);
+
             var loggerMock = new Mock<ILogger<DonationController>>();
 
             DonationController donationController = new(
                 loggerMock.Object,
                 donationRepositoryMock.Object,
-                fundraiserProviderMock.Object
+                fundraiserProviderMock.Object,
+                userProviderMock.Object
                 );
 
             // When
@@ -137,12 +156,15 @@ namespace GivingCircle.Api.UnitTest.Controllers
                 .Setup(x => x.MakeDonation(makeDonationRequest.FundraiserId, makeDonationRequest.Amount))
                 .ReturnsAsync(true);
 
+            var userProviderMock = new Mock<IUserProvider>();
+
             var loggerMock = new Mock<ILogger<DonationController>>();
 
             DonationController donationController = new(
                 loggerMock.Object,
                 donationRepositoryMock.Object,
-                fundraiserProviderMock.Object
+                fundraiserProviderMock.Object,
+                userProviderMock.Object
                 );
 
             // When

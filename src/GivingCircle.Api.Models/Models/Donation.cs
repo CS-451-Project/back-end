@@ -21,5 +21,8 @@ namespace GivingCircle.Api.Models
 
         // The amount donated to the fundraiser
         public double Amount { get; set; }
+
+        // The donor's name, may be null
+        public string Name { get; set; }
     }
 }

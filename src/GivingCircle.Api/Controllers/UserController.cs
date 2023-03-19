@@ -111,14 +111,17 @@ namespace GivingCircle.Api.Controllers
             _logger.LogInformation("Received GET request");
             try
             {
-                Guid.Parse(userId);
-
-                user = await _userRepository.GetUserAsync(userId);
+                user = await _userProvider.GetUserAsync(userId);
             }
             catch (FormatException ex)
             {
                 _logger.LogError(ex.Message);
-                return BadRequest("Invalid id");
+                return BadRequest("Invalid id format");
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogError(ex.Message);
+                return BadRequest("User does not exist");
             }
             catch (Exception err)
             {
