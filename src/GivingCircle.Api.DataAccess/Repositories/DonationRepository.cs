@@ -39,7 +39,8 @@ namespace GivingCircle.Api.DataAccess.Repositories
             // Construct the query
             var query = queryBuilder
                 .Append($"SELECT * FROM {_tableName} ")
-                .Append("WHERE fundraiser_id=@FundraiserId")
+                .Append("WHERE fundraiser_id=@FundraiserId ")
+                .Append("ORDER BY date DESC ")
                 .ToString();
 
             donations = await _postgresClient.QueryAsync<Donation>(query, parameters);
