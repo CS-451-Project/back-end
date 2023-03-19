@@ -32,11 +32,11 @@ namespace GivingCircle.Api.UnitTest.Controllers
             };
 
             var userRepositoryMock = new Mock<IUserRepository>();
-            userRepositoryMock
-                .Setup(x => x.GetUserAsync(userId))
-                .ReturnsAsync(userResponse);
 
             var userProviderMock = new Mock<IUserProvider>();
+            userProviderMock
+                .Setup(x => x.GetUserAsync(userId))
+                .ReturnsAsync(userResponse);
 
             var loggerMock = new Mock<ILogger<UserController>>();
 

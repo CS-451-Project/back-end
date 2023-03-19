@@ -66,6 +66,7 @@ namespace GivingCircle.Api.DataAccess.Repositories
                 { "@Message", donation.Message },
                 { "@Date", donation.Date },
                 { "@Amount", donation.Amount },
+                { "@Name", donation.Name }
             };
 
             // The parameters
@@ -77,8 +78,8 @@ namespace GivingCircle.Api.DataAccess.Repositories
             // Construct the query
             var query = queryBuilder
                 .Append($"INSERT INTO {_tableName} ")
-                .Append("(fundraiser_id, user_id, donation_id, date, message, amount) ")
-                .Append("VALUES (@FundraiserId, @UserId, @DonationId, @Date, @Message, @Amount) ")
+                .Append("(fundraiser_id, user_id, donation_id, date, message, amount, name) ")
+                .Append("VALUES (@FundraiserId, @UserId, @DonationId, @Date, @Message, @Amount, @Name) ")
                 .ToString();
 
             createdResult = await _postgresClient.ExecuteAsync(query, parameters);

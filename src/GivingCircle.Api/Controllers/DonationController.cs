@@ -24,6 +24,8 @@ namespace GivingCircle.Api.Controllers
 
         private readonly IFundraiserProvider _fundraiserProvider;
 
+        private readonly IUserProvider _userProvider;
+
         /// <summary>
         /// Controller for the <see cref="Donation"/> resource.
         /// </summary>
@@ -33,11 +35,13 @@ namespace GivingCircle.Api.Controllers
         public DonationController(
             ILogger<DonationController> logger,
             IDonationRepository donationRepository,
-            IFundraiserProvider fundraiserProvider) 
+            IFundraiserProvider fundraiserProvider,
+            IUserProvider userProvider) 
         {
             _logger = logger;
             _donationRepository = donationRepository;
             _fundraiserProvider = fundraiserProvider;
+            _userProvider = userProvider;
         }
 
         /// <summary>
@@ -102,7 +106,8 @@ namespace GivingCircle.Api.Controllers
                     Date = date,
                     FundraiserId = request.FundraiserId,
                     Message = request.Message,
-                    UserId = null
+                    UserId = null,
+                    Name = null
                 };
 
                 // Create the donation
@@ -144,6 +149,10 @@ namespace GivingCircle.Api.Controllers
                 // Generate todays date
                 var date = DateTime.Now;
 
+                // Get the user's name
+                var user = await _userProvider.GetUserAsync(userId);
+                var name = user.FirstName + " " + user.LastName;
+
                 Donation donation = new()
                 {
                     DonationId = donationId,
@@ -151,7 +160,8 @@ namespace GivingCircle.Api.Controllers
                     Date = date,
                     FundraiserId = request.FundraiserId,
                     Message = request.Message,
-                    UserId = userId
+                    UserId = userId,
+                    Name = name
                 };
 
                 // Create the donation
