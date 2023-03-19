@@ -34,13 +34,15 @@ namespace GivingCircle.Api.DataAccess.Repositories
             {
                 user = await _postgresClient.QuerySingleAsync<GetUserResponse>("SELECT * FROM users WHERE user_id = @UserId", parameters);
             }
+            // If the sequence conatains no elements then this exception is thrown
+            // That is equivalent to the user not existing
             catch (InvalidOperationException ex)
             {
                 Console.WriteLine(ex);
                 return null;
             }
 
-            return user ?? null;
+            return user;
         }
 
         public async Task<bool> CreateUserAsync(User user)

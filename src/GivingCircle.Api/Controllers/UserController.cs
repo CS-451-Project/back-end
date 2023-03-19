@@ -121,7 +121,7 @@ namespace GivingCircle.Api.Controllers
             catch (InvalidOperationException ex)
             {
                 _logger.LogError(ex.Message);
-                return BadRequest("User does not exist");
+                return NotFound("User does not exist");
             }
             catch (Exception err)
             {
