@@ -116,7 +116,7 @@ namespace GivingCircle.Api.Controllers
             catch (FormatException ex)
             {
                 _logger.LogError(ex.Message);
-                return BadRequest("Invalid id format");
+                return BadRequest("Invalid id");
             }
             // If the sequence conatains no elements then this exception is thrown
             // That is equivalent to the user not existing
