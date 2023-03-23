@@ -25,7 +25,6 @@ namespace GivingCircle.Api.IntegrationTest.Services
 
             var createFundraiserRequest = new CreateFundraiserRequest
             {
-                BankInformationId = "f336eb4d-ace0-4f4b-9c90-ac3c16096acf",
                 Description = "test fundraiser description",
                 Title = "Test fundraiser",
                 PlannedEndDate = DateTime.Now.AddMonths(2).ToString(),

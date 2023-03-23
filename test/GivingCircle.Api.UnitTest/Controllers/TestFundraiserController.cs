@@ -270,7 +270,6 @@ namespace GivingCircle.Api.UnitTest.Controllers
 
             var createFundraiserRequest = new CreateFundraiserRequest
             {
-                BankInformationId = "f336eb4d-ace0-4f4b-9c90-ac3c16096acf",
                 Description = "test fundraiser description",
                 Title = "Test fundraiser",
                 PlannedEndDate = "12/12/2024",

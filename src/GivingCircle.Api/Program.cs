@@ -1,3 +1,4 @@
+using Amazon.S3;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using GivingCircle.Api.Authorization;
@@ -33,16 +34,21 @@ var builder = WebApplication.CreateBuilder(args);
     // Register repositories
     var postgresClient = new PostgresClient(new PostgresClientConfiguration()
     {
-        ConnectionString = builder.Configuration.GetConnectionString("DbConnection")
+        ConnectionString = builder.Configuration.GetConnectionString("DatabaseConnectionString")
     });
-    services.AddSingleton<IFundraiserRepository>(x => new FundraiserRepository(postgresClient));
-    services.AddSingleton<IBankAccountRepository>(x => new BankAccountRepository(postgresClient));
-    services.AddSingleton<IUserRepository>(x => new UserRepository(postgresClient));
-    services.AddSingleton<IDonationRepository>(x => new DonationRepository(postgresClient));
+    services.AddSingleton<IFundraiserRepository>(new FundraiserRepository(postgresClient));
+    services.AddSingleton<IBankAccountRepository>(new BankAccountRepository(postgresClient));
+    services.AddSingleton<IUserRepository>(new UserRepository(postgresClient));
+    services.AddSingleton<IDonationRepository>(new DonationRepository(postgresClient));
 
     // Register Providers
     services.AddSingleton<IUserProvider, UserProvider>();
     services.AddSingleton<IFundraiserProvider, FundraiserProvider>();
+
+    // Register AWS S3
+    var awsAccessKey = builder.Configuration.GetConnectionString("AwsAccessKeyId");
+    var awsSecretKey = builder.Configuration.GetConnectionString("AwsSecretAccessKey");
+    services.AddSingleton<IAmazonS3>(new AmazonS3Client(awsAccessKey, awsSecretKey));
 
     // Register automatic fluent validation
     services.AddFluentValidationAutoValidation();

@@ -38,5 +38,6 @@ up with a page not found error
 
 ### Useful Links
 
-[ASP.NET Core Middleware Order](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/middleware/?view=aspnetcore-7.0#middleware-order)
+* [ASP.NET Core Middleware Order](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/middleware/?view=aspnetcore-7.0#middleware-order)
+* https://docs.aws.amazon.com/sdkfornet/v3/apidocs/items/S3/TIS3.html
 
