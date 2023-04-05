@@ -100,7 +100,7 @@ namespace GivingCircle.Api.DataAccess.Repositories
                 .Append("AND closed_date IS NULL")
                 .ToString();
 
-            fundraiser = await _postgresClient.QuerySingleAsync<GetFundraiserResponse>(query, parameters);
+            fundraiser = await _postgresClient.QuerySingleAsync<string>(query, parameters);
 
             return fundraiser ?? null;
         }

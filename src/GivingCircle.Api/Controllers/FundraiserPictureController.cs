@@ -42,36 +42,37 @@ namespace GivingCircle.Api.Controllers
             _fundraiserProvider = fundraiserProvider;
         }
 
-        [HttpGet("user/{userId}/fundraiser/{fundraiserId}/image")]
-        public async Task<IActionResult> GetFundraiserPicture(string userId, string fundraiserId)
-        {
-            // Get the url
-            try
-            {
-                var pictureId = await _fundraiserProvider.GetFundraiserPictureId(fundraiserId);
+        //[HttpGet("user/{userId}/fundraiser/{fundraiserId}/image")]
+        //public async Task<IActionResult> GetFundraiserPicture(string userId, string fundraiserId)
+        //{
+        //    // Get the url
+        //    try
+        //    {
+        //        var pictureId = await _fundraiserProvider.GetFundraiserPictureId(fundraiserId);
 
-                GetObjectRequest getObjectRequest = new() 
-                { 
-                    BucketName= _bucketName,
-                    Key = pictureId
-                };
+        //        GetObjectRequest getObjectRequest = new() 
+        //        { 
+        //            BucketName= _bucketName,
+        //            Key = pictureId
+        //        };
 
-                var getObjectResponse = await _s3Client.GetObjectAsync(getObjectRequest);
+        //        var getObjectResponse = await _s3Client.GetObjectAsync(getObjectRequest);
 
-                if (getObjectResponse.HttpStatusCode != System.Net.HttpStatusCode.OK)
-                {
-                    return StatusCode(500);
-                }
+        //        if (getObjectResponse.HttpStatusCode != System.Net.HttpStatusCode.OK)
+        //        {
+        //            return StatusCode(500);
+        //        }
 
-                var fundraiserPicture = getObjectResponse.Key;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message, ex);
-            }
+        //        var fundraiserPicture = getObjectResponse.Key;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex.Message, ex);
+        //    }
 
-            // Use the url to get the image and return the image
-        }
+        //    // Use the url to get the image and return the image
+        //    return Ok();
+        //}
 
         [@Authorize]
         [HttpPost("user/{userId}/fundraiser/{fundraiserId}/image")]
@@ -97,7 +98,9 @@ namespace GivingCircle.Api.Controllers
                     return StatusCode(500);
                 }
 
-                result = await _fundraiserProvider.UpdateFundraiserPictureId(userId, fundraiserId, pictureId);
+                var pictureUrl = $"https://fundraiser-images.s3.us-east-2.amazonaws.com/{pictureId}";
+
+                result = await _fundraiserProvider.UpdateFundraiserPictureId(userId, fundraiserId, pictureUrl);
             }
             catch(Exception ex)
             {
