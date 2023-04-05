@@ -74,6 +74,13 @@ namespace GivingCircle.Api.DataAccess.Repositories
 
         Task<string> GetFundraiserPictureIdAsync(string fundraiserId);
 
+        /// <summary>
+        /// Updates the picture id to the new picture URL
+        /// </summary>
+        /// <param name="userId">The user id</param>
+        /// <param name="fundraiserId">The fundraiser id</param>
+        /// <param name="pictureId">The picture URL</param>
+        /// <returns>True if success</returns>
         Task<bool> UpdateFundraiserPictureIdAsync(string userId, string fundraiserId, string pictureId);
     }
 }

@@ -12,8 +12,13 @@ namespace GivingCircle.Api.Providers
         /// <returns>True if success, false if error</returns>
         Task<bool> MakeDonation(string fundraiserId, double amount);
 
-        Task<string> GetFundraiserPictureId(string fundraiserId);
-
+        /// <summary>
+        /// Updates the picture id to the new picture URL
+        /// </summary>
+        /// <param name="userId">The user id</param>
+        /// <param name="fundraiserId">The fundraiser id</param>
+        /// <param name="pictureId">The picture URL</param>
+        /// <returns>True if success</returns>
         Task<bool> UpdateFundraiserPictureId(string userId, string fundraiserId, string pictureId);
     }
 }

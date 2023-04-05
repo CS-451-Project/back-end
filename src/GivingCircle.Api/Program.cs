@@ -15,6 +15,7 @@ using GivingCircle.Api.Validation;
 using GivingCircle.Api.Validation.FundraiserService;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -66,7 +67,6 @@ var builder = WebApplication.CreateBuilder(args);
     services.AddSingleton<IBankAccountRepository>(new BankAccountRepository(postgresClient));
     services.AddSingleton<IUserRepository>(new UserRepository(postgresClient));
     services.AddSingleton<IDonationRepository>(new DonationRepository(postgresClient));
-    services.AddSingleton<IFundraiserPictureRepository>(new FundraiserPictureRepository(postgresClient));
 
     // Register Providers
     services.AddSingleton<IUserProvider, UserProvider>();
@@ -81,6 +81,8 @@ var builder = WebApplication.CreateBuilder(args);
     services.AddSingleton<IValidator<CreateUserRequest>, CreateUserRequestValidator>();
     services.AddSingleton<IValidator<LoginRequest>, LoginRequestValidator>();
     services.AddSingleton<IValidator<MakeDonationRequest>, MakeDonationRequestValidator>();
+    services.AddSingleton<IValidator<IFormFile>, FileValidator>();
+    services.AddSingleton<IValidator<UploadFundraiserImageRequest>, UploadFundraiserImageRequestValidator>();
 }
 
 var app = builder.Build();
