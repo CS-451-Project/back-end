@@ -18,11 +18,29 @@ namespace GivingCircle.Api.Providers
             _fundraiserRepository = fundraiserRepository;
         }
 
+        public async Task<string> GetFundraiserPictureId(string fundraiserId)
+        {
+            string result;
+
+            result = await _fundraiserRepository.GetFundraiserPictureIdAsync(fundraiserId);
+
+            return result;
+        }
+
         public async Task<bool> MakeDonation(string fundraiserId, double amount)
         {
             bool result;
 
             result = await _fundraiserRepository.MakeDonation(fundraiserId, amount);
+
+            return result;
+        }
+
+        public async Task<bool> UpdateFundraiserPictureId(string userId, string fundraiserId, string pictureId)
+        {
+            bool result;
+
+            result = await _fundraiserRepository.UpdateFundraiserPictureIdAsync(userId, fundraiserId, pictureId);
 
             return result;
         }

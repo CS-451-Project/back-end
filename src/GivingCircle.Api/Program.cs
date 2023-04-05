@@ -66,6 +66,7 @@ var builder = WebApplication.CreateBuilder(args);
     services.AddSingleton<IBankAccountRepository>(new BankAccountRepository(postgresClient));
     services.AddSingleton<IUserRepository>(new UserRepository(postgresClient));
     services.AddSingleton<IDonationRepository>(new DonationRepository(postgresClient));
+    services.AddSingleton<IFundraiserPictureRepository>(new FundraiserPictureRepository(postgresClient));
 
     // Register Providers
     services.AddSingleton<IUserProvider, UserProvider>();
