@@ -12,7 +12,7 @@ namespace GivingCircle.Api.Validation
         {
             // File must not be null and must be smaller than or equal to a megabyte
             RuleFor(x => x.Length).NotNull().LessThanOrEqualTo(MB)
-                .WithMessage("File size is larger than allowed");
+                .WithMessage("File size is larger than 1 MB");
 
             // Only accepting jpg files
             RuleFor(x => x.ContentType).NotNull().Must(x => x.Equals("image/jpeg") || x.Equals("image/jpg"))
