@@ -70,9 +70,11 @@ namespace GivingCircle.Api.Controllers
                 }
 
                 // Save file locally
-                using FileStream filestream = System.IO.File.Create(filePath);
-                request.FundraiserImage.CopyTo(filestream);
-                filestream.Flush();
+                using (FileStream filestream = System.IO.File.Create(filePath))
+                {
+                    request.FundraiserImage.CopyTo(filestream);
+                    filestream.Flush();
+                }
 
                 // Create AWS S3 put object request
                 var putObjectRequest = new PutObjectRequest
