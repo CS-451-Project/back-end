@@ -350,9 +350,6 @@ namespace GivingCircle.Api.DataAccess.Repositories
             // This represents the number of rows effected by our query
             int donateResult;
 
-            // Generate todays date
-            DateTime closedDate = DateTime.Now;
-
             parameters.Add("@Amount", amount);
             parameters.Add("@FundraiserId", fundraiserId);
 
@@ -366,6 +363,58 @@ namespace GivingCircle.Api.DataAccess.Repositories
             donateResult = await _postgresClient.ExecuteAsync(query, parameters);
 
             return (donateResult == 1);
+        }
+
+        public async Task<string> GetFundraiserPictureIdAsync(string fundraiserId)
+        {
+            // The fundraiser picture id to be returned
+            string fundraiserPictureId;
+
+            // The query string builder
+            StringBuilder queryBuilder = new();
+
+            // The parameters to be given to the query
+            DynamicParameters parameters = new();
+
+            parameters.Add("@FundraiserId", fundraiserId);
+
+            // Construct the query
+            var query = queryBuilder
+                .Append($"SELECT picture_id FROM {_tableName} ")
+                .Append("WHERE fundraiser_id=@FundraiserId ")
+                .Append("AND closed_date IS NULL")
+                .ToString();
+
+            fundraiserPictureId = await _postgresClient.QuerySingleAsync<string>(query, parameters);
+
+            return fundraiserPictureId ?? null;
+        }
+
+        public async Task<bool> UpdateFundraiserPictureIdAsync(string userId, string fundraiserId, string pictureId)
+        {
+            // The query string builder
+            StringBuilder queryBuilder = new();
+
+            // The dynamic parameters to be supplied to the query
+            DynamicParameters parameters = new();
+
+            // This represents the number of rows effected by our query
+            int result;
+
+            parameters.Add("@OrganizerId", userId);
+            parameters.Add("@FundraiserId", fundraiserId);
+            parameters.Add("@PictureId", pictureId);
+
+            // Build the query
+            var query = queryBuilder
+                .Append($"UPDATE {_tableName} ")
+                .Append("SET picture_id = @PictureId ")
+                .Append("WHERE fundraiser_id = @FundraiserId AND organizer_id = @OrganizerId")
+                .ToString();
+
+            result = await _postgresClient.ExecuteAsync(query, parameters);
+
+            return (result == 1);
         }
     }
 }

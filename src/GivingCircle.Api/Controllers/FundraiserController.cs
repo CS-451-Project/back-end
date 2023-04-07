@@ -212,8 +212,8 @@ namespace GivingCircle.Api.Controllers
                 {
                     FundraiserId = fundraiserId,
                     OrganizerId = userId,
-                    BankInformationId = request.BankInformationId,
-                    PictureId = request.PictureId,
+                    BankInformationId = null,
+                    PictureId = null,
                     Description = description,
                     Title = request.Title,
                     CreatedDate = createdDate,

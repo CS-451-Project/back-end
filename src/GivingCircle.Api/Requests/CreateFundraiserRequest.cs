@@ -7,13 +7,6 @@ namespace GivingCircle.Api.Requests
     /// </summary>
     public class CreateFundraiserRequest
     {
-        // The fundraiser's bank account information id
-        [Required]
-        public string BankInformationId { get; set; }
-
-        // The fundraiser's picture's id
-        public string PictureId { get; set; }
-
         // The fundraiser description
         public string Description { get; set; }
 

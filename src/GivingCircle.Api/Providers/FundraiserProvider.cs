@@ -26,5 +26,14 @@ namespace GivingCircle.Api.Providers
 
             return result;
         }
+
+        public async Task<bool> UpdateFundraiserPictureId(string userId, string fundraiserId, string pictureId)
+        {
+            bool result;
+
+            result = await _fundraiserRepository.UpdateFundraiserPictureIdAsync(userId, fundraiserId, pictureId);
+
+            return result;
+        }
     }
 }

@@ -13,7 +13,7 @@ namespace GivingCircle.Api.Models
         // The fundraiser's bank account information id
         public string BankInformationId { get; set; }
 
-        // The fundraiser's picture's id
+        // The fundraiser's picture's URL
         public string PictureId { get; set; }
 
         // The fundraiser description
