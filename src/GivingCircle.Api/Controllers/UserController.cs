@@ -1,4 +1,5 @@
-﻿using GivingCircle.Api.Authorization;
+﻿using Amazon.Runtime.Internal;
+using GivingCircle.Api.Authorization;
 using GivingCircle.Api.DataAccess.Repositories;
 using GivingCircle.Api.DataAccess.Responses;
 using GivingCircle.Api.Models;
@@ -132,6 +133,36 @@ namespace GivingCircle.Api.Controllers
             }
 
             return Ok(user);
+        }
+
+        [@Authorize]
+        [HttpPut("user/{userId}")]
+        public async Task<IActionResult> UpdateUser(string userId, UpdateUserRequest request)
+        {
+            // True if successfully updated, false if there was an issue
+            bool updateUserResult;
+
+            try
+            {
+                // Create the User object
+                User user = new()
+                {
+                    UserId = userId, 
+                    FirstName = request.FirstName,
+                    LastName = request.LastName,
+                    MiddleInitial = request.MiddleInitial, 
+                    Password = request.Password
+                };
+
+                updateUserResult = await _userRepository.UpdateUserAsync(userId, user);
+            }
+            catch (Exception err)
+            {
+                _logger.LogError("Error updating user", err);
+                return StatusCode(500, "Something went wrong");
+            }
+
+            return (updateUserResult) ? StatusCode(200) : StatusCode(500, "Something went wrong");
         }
 
         [@Authorize]

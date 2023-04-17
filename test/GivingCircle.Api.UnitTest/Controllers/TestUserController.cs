@@ -91,6 +91,42 @@ namespace GivingCircle.Api.UnitTest.Controllers
         }
 
         [Fact]
+        public async Task TestUpdateUserHappyPath()
+        {
+            // Given
+            var updateUserRequest = new UpdateUserRequest
+            {
+                FirstName =  "James",
+                MiddleInitial =  "X",
+                LastName =  "Holden",
+                Password =  "test"
+            };
+
+            var userId = Guid.NewGuid().ToString();
+
+            var userRepositoryMock = new Mock<IUserRepository>();
+            userRepositoryMock
+                .Setup(x => x.UpdateUserAsync(It.IsAny<string>(), It.IsAny<User>()))
+                .ReturnsAsync(true);
+
+            var loggerMock = new Mock<ILogger<UserController>>();
+
+            var userProviderMock = new Mock<IUserProvider>();
+
+            var controllerMock = new UserController(
+                loggerMock.Object,
+                userRepositoryMock.Object,
+                userProviderMock.Object
+                );
+
+            // When
+            var result = await controllerMock.UpdateUser(userId, updateUserRequest) as StatusCodeResult;
+
+            // Then
+            Assert.Equal(StatusCodes.Status200OK, result.StatusCode);
+        }
+
+        [Fact]
         public async Task TestLoginHappyPath()
         {
             // Given
