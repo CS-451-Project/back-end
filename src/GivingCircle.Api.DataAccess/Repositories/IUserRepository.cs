@@ -32,7 +32,7 @@ namespace GivingCircle.Api.DataAccess.Repositories
         /// </summary>
         /// <param name="userId">The user's id</param>
         /// <param name="user">The user to update</param>
-        /// <returns>True if success, false or an error if un successful</returns>
+        /// <returns>True if success, false or an error if unsuccessful</returns>
         Task<bool> UpdateUserAsync(string userId, User user);
 
         /// <summary>

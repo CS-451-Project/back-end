@@ -69,7 +69,6 @@ namespace GivingCircle.Api.DataAccess.Repositories
                 { "@MiddleInitial",  user.MiddleInitial},
                 { "@LastName", user.LastName},
                 { "@Password", user.Password },
-                { "@Email", user.Email },
                 { "@UserId", userId }
             };
 
@@ -79,11 +78,10 @@ namespace GivingCircle.Api.DataAccess.Repositories
             // Build the query
             var query = queryBuilder
                 .Append($"UPDATE users ")
-                .Append("SET first_name = @FirtName ")
+                .Append("SET first_name = @FirstName, ")
                 .Append("middle_initial = @MiddleInitial, ")
                 .Append("last_name = @LastName, ")
-                .Append("password = @Password, ")
-                .Append("email = @Email ")
+                .Append("password = @Password ")
                 .Append("WHERE user_id = @UserId ")
                 .ToString();
 
